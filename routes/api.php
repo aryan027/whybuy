@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\SubCategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,7 +21,18 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
     Route::post('logout',[AuthController::class,'logout']);
 });
 
-Route::post('register',[\App\Http\Controllers\Api\AuthController::class,'register']);
-Route::post('verify',[\App\Http\Controllers\Api\AuthController::class,'verify_otp']);
-Route::post('login',[\App\Http\Controllers\Api\AuthController::class,'login']);
+Route::post('register',[AuthController::class,'register']);
+Route::post('verify',[AuthController::class,'verify_otp']);
+Route::post('login',[AuthController::class,'login']);
 Route::get('authentication',[AuthController::class,'authentication'])->name('authentication');
+Route::group(['prefix' => 'category'], function () {
+    Route::get('/', [CategoryController::class, 'listing']);
+    Route::get('/{cid}', [CategoryController::class, 'categoryInformation']);
+});
+Route::group(['prefix' => 'sub-category'], function () {
+    Route::get('/', [SubCategoryController::class, 'listing']);
+    Route::get('/{cid}', [SubCategoryController::class, 'subCategoriesById']);
+});
+Route::group(['middleware' => 'auth:sanctum'], function () {
+    //
+});
