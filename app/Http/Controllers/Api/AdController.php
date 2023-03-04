@@ -53,4 +53,9 @@ class AdController extends Controller
         }
         return $this->SuccessResponse(200, 'Ad Sent for approval', $create);
     }
+
+    public function adsListing() {
+        $ads = Advertisement::with('subCategory', 'category')->where(['status' => true, 'approved' => true, 'published' => true])->latest()->get();
+        return $this->SuccessResponse(200, 'Advertisement Fetched Successfully', $ads);
+    }
 }

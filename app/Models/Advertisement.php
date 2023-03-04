@@ -17,4 +17,12 @@ class Advertisement extends Model
     ];
 
     protected $guarded = ['id'];
+
+    public function category() {
+        return $this->belongsTo(Category::class, 'category', 'id');
+    }
+
+    public function subCategory() {
+        return $this->belongsTo(SubCategory::class, 'sub_category', 'id');
+    }
 }
