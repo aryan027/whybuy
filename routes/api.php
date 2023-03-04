@@ -34,7 +34,8 @@ Route::group(['prefix' => 'sub-category'], function () {
     Route::get('/{cid}', [SubCategoryController::class, 'subCategoriesById']);
 });
 Route::group(['middleware' => 'auth:sanctum'], function () {
-    //
+
+    Route::get('packages',[\App\Http\Controllers\Api\PackageController::class,'package_listing']);
 });
 
 Route::get('about-us',[\App\Http\Controllers\Api\AboutUsController::class,'AboutUs']);
