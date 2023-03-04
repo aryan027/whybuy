@@ -36,3 +36,5 @@ Route::group(['prefix' => 'sub-category'], function () {
 Route::group(['middleware' => 'auth:sanctum'], function () {
     //
 });
+
+Route::get('about-us',[\App\Http\Controllers\Api\AboutUsController::class,'AboutUs']);
