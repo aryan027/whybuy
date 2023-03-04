@@ -54,7 +54,7 @@ class SubCategoryController extends Controller
      */
     public function subCategoryInfo($sid) {
         try {
-            $subCategory = $this->subCategories->where(['id' => $sid])->first();
+            $subCategory = $this->subCategories->where('id', $sid)->first();
             if (!$subCategory) {
                 return $this->ErrorResponse(404, 'Sub Category not found');
             }
