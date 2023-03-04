@@ -40,3 +40,5 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post('/create', [AdController::class, 'createAdvertisement']);
     });
 });
+
+Route::get('about-us',[\App\Http\Controllers\Api\AboutUsController::class,'AboutUs']);
