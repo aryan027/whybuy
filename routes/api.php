@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AdController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\SubCategoryController;
@@ -35,5 +36,7 @@ Route::group(['prefix' => 'sub-category'], function () {
     Route::get('/information/{sid}', [SubCategoryController::class, 'subCategoryInfo']);
 });
 Route::group(['middleware' => 'auth:sanctum'], function () {
-    //
+    Route::group(['prefix' => 'my-ads'], function () {
+        Route::post('/create', [AdController::class, 'createAdvertisement']);
+    });
 });
