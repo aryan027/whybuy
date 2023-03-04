@@ -32,6 +32,7 @@ Route::group(['prefix' => 'category'], function () {
 Route::group(['prefix' => 'sub-category'], function () {
     Route::get('/', [SubCategoryController::class, 'listing']);
     Route::get('/{cid}', [SubCategoryController::class, 'subCategoriesById']);
+    Route::get('/information/{sid}', [SubCategoryController::class, 'subCategoryInfo']);
 });
 Route::group(['middleware' => 'auth:sanctum'], function () {
     //
