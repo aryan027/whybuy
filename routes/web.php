@@ -1,6 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\PasswordController;
+use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\SubCategoryController;
+use App\Http\Controllers\Admin\ChildCategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,10 +18,33 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     // return view('welcome');
+//     return view('auth.login');
+// });
+Route::get('/', [App\Http\Controllers\HomeController::class, 'login']);
+Route::get('/admin', [App\Http\Controllers\HomeController::class, 'login']);
+
+// Route::get('/admin', function () {
+//     // return view('welcome');
+//     return view('auth.login');
+// });
 
 Auth::routes();
+Route::middleware(['auth'])->group(function () {
+    Route::prefix('admin')->group(function () {
+        Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::put('password', [PasswordController::class, 'update'])->name('password.update');
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+        // Countries
+        Route::resource('category', CategoryController::class);
+
+        // Sub category
+        Route::resource('sub-category', SubCategoryController::class);
+
+        // Child category
+        Route::resource('child-category', ChildCategoryController::class);
+    });
+});
