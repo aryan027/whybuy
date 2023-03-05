@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\SubCategoryController;
 use App\Http\Controllers\Admin\ChildCategoryController;
+use App\Http\Controllers\Admin\AdvertisementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,5 +47,9 @@ Route::middleware(['auth'])->group(function () {
 
         // Child category
         Route::resource('child-category', ChildCategoryController::class);
+
+        // Advertisement module
+        Route::resource('advertisement', AdvertisementController::class);
+        Route::put('advertisement-approve/{id}', [AdvertisementController::class,'advertisementApprove'])->name('advertisement.approve');        
     });
 });

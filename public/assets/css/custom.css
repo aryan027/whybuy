@@ -16,3 +16,6 @@
     bottom: 170px;
     right: 0;
 }
+.approved-status{
+    cursor: pointer;
+}

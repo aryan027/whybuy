@@ -45,6 +45,13 @@
                         <span>Child Category</span>
                     </a>
                 </li>  --}}
+
+                <li class="sidebar-item {{ Request::segment(2) === 'advertisement' ? 'active' : '' }}">
+                    <a href="{{route('advertisement.index')}}" class='sidebar-link'>
+                        <i class="bi bi-badge-ad"></i>
+                        <span>Advertisement</span>
+                    </a>
+                </li> 
             </ul>
         </div>
     </div>

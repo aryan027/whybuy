@@ -17,7 +17,6 @@ class SubCategory extends Model
 
     const IS_ACTIVE = 1;
     const IS_INACTIVE = 2;
-    
     protected $guarded = ['id'];
 
     /**

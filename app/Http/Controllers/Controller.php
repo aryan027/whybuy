@@ -8,6 +8,7 @@ use Illuminate\Routing\Controller as BaseController;
 use App\Models\Category;
 use App\Models\SubCategory;
 use App\Models\ChildCategory;
+use App\Models\Advertisement;
 
 class Controller extends BaseController
 {
@@ -17,6 +18,7 @@ class Controller extends BaseController
         $this->category = new Category();
         $this->subCategory = new SubCategory();
         $this->childCategory = new ChildCategory();
+        $this->advertisement = new Advertisement();
     }
     public function SuccessResponse($code,$message,$data=null){
 
