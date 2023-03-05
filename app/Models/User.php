@@ -60,4 +60,12 @@ class User extends Authenticatable implements HasMedia
         'email_verified_at' => 'datetime',
         'last_login' =>'datetime'
     ];
+
+    public $appends = ['full_name'];
+
+    public function getFullNameAttribute()
+    {
+        return "{$this->fname} {$this->lname}";
+    }
+
 }
