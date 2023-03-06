@@ -1,0 +1,21 @@
+.header{
+    height: 60px;
+    background: #ffffff;
+}
+.nav-item.navbar-dropdown.dropdown-user.dropdown {
+    margin-right: 10px;
+}
+.row .form-group label.error{
+    color: #dc3545;
+}
+.gallery .delete-images{
+    position: relative;
+}
+.gallery .delete-images .delete-btn{
+    position: absolute;
+    bottom: 170px;
+    right: 0;
+}
+.approved-status{
+    cursor: pointer;
+}

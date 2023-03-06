@@ -35,6 +35,7 @@ Route::group(['prefix' => 'sub-category'], function () {
     Route::get('/{cid}', [SubCategoryController::class, 'subCategoriesById']);
     Route::get('/information/{sid}', [SubCategoryController::class, 'subCategoryInfo']);
 });
+Route::get('ads', [AdController::class, 'adsListing']);
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::group(['prefix' => 'my-ads'], function () {
         Route::get('/', [AdController::class, 'myAds']);

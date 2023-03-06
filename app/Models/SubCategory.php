@@ -6,14 +6,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @method static where(array $array)
  */
 class SubCategory extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
 
+    const IS_ACTIVE = 1;
+    const IS_INACTIVE = 2;
     protected $guarded = ['id'];
 
     /**
@@ -31,4 +34,13 @@ class SubCategory extends Model
     {
         return $this->hasMany(ChildCategory::class, 'sub_category_id', 'id');
     }
+
+    // Check child category avilable or not
+    public static function checkChildCategoryOrNot($category){
+        $data = $category->childCategory->pluck('id')->contains(function ($val) {
+            return true;
+        });
+        return $data;
+    }
+    
 }
