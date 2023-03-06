@@ -37,6 +37,7 @@ Route::group(['prefix' => 'sub-category'], function () {
 });
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::group(['prefix' => 'my-ads'], function () {
+        Route::get('/', [AdController::class, 'myAds']);
         Route::post('/create', [AdController::class, 'createAdvertisement']);
     });
     Route::get('packages',[\App\Http\Controllers\Api\PackageController::class,'package_listing']);
