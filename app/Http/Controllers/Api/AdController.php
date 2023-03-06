@@ -49,32 +49,13 @@ class AdController extends Controller
             return $this->ErrorResponse(500, 'Unable to Insert records', $create);
         }
         if ($request->hasFile('image')) {
-            foreach ($request->image as $image)
-            {
-                $create->addMedia($image)->toMediaCollection('ads');
-            }
-
+//            $create->AddMedia($request['image'])->toMediaCollection('ads');
         }
         return $this->SuccessResponse(200, 'Ad Sent for approval', $create);
     }
 
-    public function myAds() {
-        $myAds = Advertisement::with('category', 'sub_category')->where(['user_id' => auth()->id()])->get()->map(function($listing){
-            $images = [];
-            foreach($listing->getMedia('ads') as  $media){
-                $images[]= $media->getFullUrl('thumb');
-            }
-            $listing->images = $images;
-            unset($listing['media']);
-            return $listing;
-        });
-        $response = array(
-            'all' => $myAds,
-            'published' => $myAds->where('published', true),
-            'in_queue' => $myAds->where('status', false)->where('published', false),
-            'not_approved' => $myAds->where('approved', false),
-            'approved' => $myAds->where('approved', true)
-        );
-        return $this->SuccessResponse(200, 'your ads fetched', $response);
+    public function adsListing() {
+        $ads = Advertisement::with('subCategory', 'category')->where(['status' => true, 'approved' => true, 'published' => true])->latest()->get();
+        return $this->SuccessResponse(200, 'Advertisement Fetched Successfully', $ads);
     }
 }
