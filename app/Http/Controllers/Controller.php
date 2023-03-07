@@ -41,12 +41,11 @@ class Controller extends BaseController
         return response($response,$code);
     }
 
-    public function ErrorResponse($code,$message, $data=null){
+    public function ErrorResponse($code,$message){
         $response=array(
             'success'=>false,
             'code'=>$code,
-            'message'=>$message,
-            'data'=>$data,
+            'message'=>$message
         );
         return response()->json($response,$code);
     }
