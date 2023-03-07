@@ -42,6 +42,9 @@ class Advertisement extends Model implements HasMedia
     public function getUser() {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
+    public function ads(){
+        return $this->belongsTo(RentItem::class,'ads_id');
+    }
 
     public function registerMediaConversions(Media $media = null): void
     {

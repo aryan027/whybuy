@@ -19,12 +19,12 @@ class AdController extends Controller
             $sub->images= $sub->image;
             unset($sub['media']);
             return $sub;
-        });;
+        });
         $this->subCategory = SubCategory::where(['status' => true])->get()->map(function ($sub){
             $sub->images= $sub->image;
             unset($sub['media']);
             return $sub;
-        });;
+        });
     }
 
     public function createAdvertisement(Request $request) {

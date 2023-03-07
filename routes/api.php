@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\Api\AboutUsController;
 use App\Http\Controllers\Api\AdController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\PackageController;
+use App\Http\Controllers\Api\RentItemController;
 use App\Http\Controllers\Api\SubCategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -41,7 +44,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post('/create', [AdController::class, 'createAdvertisement']);
         Route::get('/', [AdController::class, 'myAds']);
     });
-    Route::get('packages',[\App\Http\Controllers\Api\PackageController::class,'package_listing']);
+    Route::group(['prefix'=>'rent'],function(){
+       Route::Post('/item',[RentItemController::class,'rentItem']) ;
+       Route::get('/item/list',[RentItemController::class,'rentItemList']);
+    });
+    Route::get('packages',[PackageController::class,'package_listing']);
 });
 
-Route::get('about-us',[\App\Http\Controllers\Api\AboutUsController::class,'AboutUs']);
+Route::get('about-us',[AboutUsController::class,'AboutUs']);
