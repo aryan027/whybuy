@@ -39,6 +39,7 @@ Route::get('ads', [AdController::class, 'adsListing']);
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::group(['prefix' => 'my-ads'], function () {
         Route::post('/create', [AdController::class, 'createAdvertisement']);
+        Route::get('/', [AdController::class, 'myAds']);
     });
     Route::get('packages',[\App\Http\Controllers\Api\PackageController::class,'package_listing']);
 });

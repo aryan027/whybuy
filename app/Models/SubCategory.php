@@ -7,13 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * @method static where(array $array)
  */
-class SubCategory extends Model
+class SubCategory extends Model implements HasMedia
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory,SoftDeletes,InteractsWithMedia;
 
     const IS_ACTIVE = 1;
     const IS_INACTIVE = 2;
@@ -42,5 +45,16 @@ class SubCategory extends Model
         });
         return $data;
     }
-    
+    public function registerMediaConversions(Media $media = null): void
+    {
+        $this->addMediaConversion('thumb')
+            ->width(368)
+            ->height(232)
+            ->sharpen(10);
+    }
+    public function getImageAttribute()
+    {
+        return $this->getFirstMediaUrl('sub_category','thumb') ;
+    }
+
 }

@@ -15,8 +15,16 @@ class AdController extends Controller
     protected $category, $subCategory;
 
     public function __construct() {
-        $this->category = Category::where(['status' => true])->get();
-        $this->subCategory = SubCategory::where(['status' => true])->get();
+        $this->category = Category::where(['status' => true])->get()->map(function ($sub){
+            $sub->images= $sub->image;
+            unset($sub['media']);
+            return $sub;
+        });;
+        $this->subCategory = SubCategory::where(['status' => true])->get()->map(function ($sub){
+            $sub->images= $sub->image;
+            unset($sub['media']);
+            return $sub;
+        });;
     }
 
     public function createAdvertisement(Request $request) {
@@ -49,7 +57,10 @@ class AdController extends Controller
             return $this->ErrorResponse(500, 'Unable to Insert records', $create);
         }
         if ($request->hasFile('image')) {
-//            $create->AddMedia($request['image'])->toMediaCollection('ads');
+            foreach ($request->image as $image)
+            {
+                $create->addMedia($image)->toMediaCollection('ads');
+            }
         }
         return $this->SuccessResponse(200, 'Ad Sent for approval', $create);
     }
@@ -58,4 +69,9 @@ class AdController extends Controller
         $ads = Advertisement::with('subCategory', 'category')->where(['status' => true, 'approved' => true, 'published' => true])->latest()->get();
         return $this->SuccessResponse(200, 'Advertisement Fetched Successfully', $ads);
     }
+    public function myAds() {
+        $ads = Advertisement::with('subCategory', 'category')->where(['user_id' => auth()->id(),'status' => true, 'approved' => true, 'published' => true])->latest()->get();
+        return $this->SuccessResponse(200, 'Advertisement Fetched Successfully', $ads);
+    }
+
 }
