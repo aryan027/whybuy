@@ -13,7 +13,13 @@ class CategoryController extends Controller
     protected array|Collection $categories;
 
     public function __construct() {
-        $this->categories = Category::with('subCategory', 'childCategory')->where(['status' => true])->get();
+        $this->categories = Category::where(['status' => true])->get()->map(function ($category){
+            $category->images= $category->image;
+            unset($category['media']);
+            return $category;
+
+        });
+
     }
 
     public function listing() {
@@ -29,6 +35,8 @@ class CategoryController extends Controller
     public function categoryInformation($cid) {
         try {
             $category = $this->categories->where('id', $cid)->first();
+            $category['image']= $category->getFirstMediaUrl('category','thumb') ;
+            unset($category['media']);
             if (!$category) {
                 return $this->ErrorResponse(404, 'Category not found');
             }

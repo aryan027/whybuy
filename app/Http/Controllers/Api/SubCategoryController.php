@@ -17,7 +17,13 @@ class SubCategoryController extends Controller
     protected array|Collection $subCategories;
 
     public function __construct() {
-        $this->subCategories = SubCategory::with('category', 'childCategory')->where(['status' => true])->get();
+        $this->subCategories = SubCategory::where(['status' => true])->get()->map(function ($sub){
+            $sub->category_name= $sub->category->name;
+            $sub->images= $sub->image;
+            unset($sub['media']);
+            unset($sub['category']);
+            return $sub;
+        });
     }
 
     /**
@@ -40,6 +46,10 @@ class SubCategoryController extends Controller
     public function subCategoriesById($cid) {
         try {
             $subCategories = $this->subCategories->where('category_id', $cid);
+            $subCategories['image']= $subCategories->getFirstMediaUrl('sub_category','thumb') ;
+            $subCategories->category_name= $subCategories->category->name;
+            unset($subCategories['category']);
+            unset($subCategories['media']);
             return $this->SuccessResponse(200, 'Sub Categories Fetched', $subCategories);
         } catch (Exception $exception) {
             logger('error occurred in sub categories find by id process');
@@ -55,6 +65,7 @@ class SubCategoryController extends Controller
     public function subCategoryInfo($sid) {
         try {
             $subCategory = $this->subCategories->where('id', $sid)->first();
+
             if (!$subCategory) {
                 return $this->ErrorResponse(404, 'Sub Category not found');
             }

@@ -26,8 +26,8 @@ class AuthController extends Controller
         if ($verified) {
             return $this->SuccessResponse(200, 'Otp already send to your registered  mobile number', null);
         }
-        $otp = rand(99999, 1000000);
-
+//        $otp = rand(99999, 1000000);
+            $otp= '123456';
         $token = md5($request->mobile . time());
         $send = Temp_token::create([
             'mobile' => $request['mobile'],
@@ -35,8 +35,8 @@ class AuthController extends Controller
             'token' => $token,
             'is_login'=> false
         ]);
-        $sms= "https://www.fast2sms.com/dev/bulkV2?authorization=wvicxQVfhgG17T8uSbjKoeJWPzpUlMRZ64IYqaFNy5nsE9Ck2DO5CQIwRhE14rxa0DtpTV7UieZfFlbk&variables_values=".$otp."&route=otp&numbers=".$request->mobile;
-        file_get_contents($sms);
+//        $sms= "https://www.fast2sms.com/dev/bulkV2?authorization=wvicxQVfhgG17T8uSbjKoeJWPzpUlMRZ64IYqaFNy5nsE9Ck2DO5CQIwRhE14rxa0DtpTV7UieZfFlbk&variables_values=".$otp."&route=otp&numbers=".$request->mobile;
+//        file_get_contents($sms);
 
         if (!$send) {
             return $this->ErrorResponse(400, 'Something went wrong. Please try again after sometime');
