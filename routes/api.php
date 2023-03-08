@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AboutUsController;
 use App\Http\Controllers\Api\AdController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\FavouriteController;
 use App\Http\Controllers\Api\PackageController;
 use App\Http\Controllers\Api\RentItemController;
 use App\Http\Controllers\Api\SubCategoryController;
@@ -49,6 +50,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
        Route::get('/item/list',[RentItemController::class,'rentItemList']);
     });
     Route::get('packages',[PackageController::class,'package_listing']);
+    Route::post('add/favourite',[FavouriteController::class,'addToFavourite']);
+    Route::post('favourite/list',[FavouriteController::class,'myFavouriteList']);
 });
 
 Route::get('about-us',[AboutUsController::class,'AboutUs']);
