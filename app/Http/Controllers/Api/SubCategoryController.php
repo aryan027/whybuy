@@ -17,11 +17,9 @@ class SubCategoryController extends Controller
     protected array|Collection $subCategories;
 
     public function __construct() {
-        $this->subCategories = SubCategory::where(['status' => true])->get()->map(function ($sub){
-            $sub->category_name= $sub->category->name;
+        $this->subCategories = SubCategory::with('category')->where(['status' => true])->get()->map(function ($sub){
             $sub->images= $sub->image;
             unset($sub['media']);
-            unset($sub['category']);
             return $sub;
         });
     }
