@@ -45,11 +45,13 @@ class SubCategoryController extends Controller
      */
     public function subCategoriesById($cid) {
         try {
-            $subCategories = $this->subCategories->where('category_id', $cid);
-            $subCategories['image']= $subCategories->getFirstMediaUrl('sub_category','thumb') ;
-            $subCategories->category_name= $subCategories->category->name;
-            unset($subCategories['category']);
-            unset($subCategories['media']);
+            $subCategories = $this->subCategories->where('category_id', $cid)->get()->map(function($sub){
+                $sub['image']= $sub->getFirstMediaUrl('sub_category','thumb') ;
+                $sub->category_name= $sub->category->name;
+                unset($sub['category']);
+                unset($sub['media']);
+            });
+
             return $this->SuccessResponse(200, 'Sub Categories Fetched', $subCategories);
         } catch (Exception $exception) {
             logger('error occurred in sub categories find by id process');
