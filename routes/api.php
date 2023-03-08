@@ -52,7 +52,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
     Route::get('packages',[PackageController::class,'package_listing']);
     Route::post('add/favourite',[FavouriteController::class,'addToFavourite']);
-    Route::post('favourite/list',[FavouriteController::class,'myFavouriteList']);
+    Route::get('favourite/list',[FavouriteController::class,'myFavouriteList']);
     Route::group(['prefix' => 'advertisement/chat'], function () {
         Route::post('initiate', [ChatController::class, 'initiateChat']);
         Route::post('{cid}', [ChatController::class, 'sendMessage']);
