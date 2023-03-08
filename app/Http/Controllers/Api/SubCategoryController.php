@@ -45,7 +45,7 @@ class SubCategoryController extends Controller
      */
     public function subCategoriesById($cid) {
         try {
-            $subCategories = $this->subCategories->where('category_id', $cid)->get()->map(function($sub){
+            $subCategories = $this->subCategories->where('category_id', $cid)->map(function($sub){
                 $sub['image']= $sub->getFirstMediaUrl('sub_category','thumb') ;
                 $sub->category_name= $sub->category->name;
                 unset($sub['category']);
