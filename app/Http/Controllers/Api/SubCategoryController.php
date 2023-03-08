@@ -50,6 +50,7 @@ class SubCategoryController extends Controller
                 $sub->category_name= $sub->category->name;
                 unset($sub['category']);
                 unset($sub['media']);
+                return $sub;
             });
 
             return $this->SuccessResponse(200, 'Sub Categories Fetched', $subCategories);
