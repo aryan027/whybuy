@@ -46,12 +46,15 @@
     <script src="{{asset('assets/js/pages/datatables.js')}}"></script>
 
     <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.7/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.js"></script>
 
     {{-- toastr js link--}}
     <script src="{{ URL::to('https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js')}}"></script>
 
     {{-- sweetalert --}}
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/34.2.0/classic/ckeditor.js"></script>
+    <script src="{{asset('assets/js/pages/ckeditor.js')}}"></script>
 
     <script>
         $(document).ready(function() {

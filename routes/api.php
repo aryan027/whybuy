@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\FavouriteController;
 use App\Http\Controllers\Api\PackageController;
 use App\Http\Controllers\Api\RentItemController;
 use App\Http\Controllers\Api\SubCategoryController;
+use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\CMSController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 

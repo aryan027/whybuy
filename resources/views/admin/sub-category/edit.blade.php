@@ -13,7 +13,7 @@
                     </div>
                     <div class="card-content">
                         <div class="card-body">
-                            <form class="form form-vertical"  method="post" action="{{ route('sub-category.update',encrypt($subCategory->id)) }}" id="add_sub_category">
+                            <form class="form form-vertical"  method="post" action="{{ route('sub-category.update',encrypt($subCategory->id)) }}" id="add_sub_category" enctype="multipart/form-data">
                                 @csrf
                                 @method('PUT')
                                 <div class="form-body">
@@ -21,7 +21,7 @@
                                         <div class="col-6">
                                             <div class="form-group mandatory">
                                                 <label class="form-label" for="name">Name</label>
-                                                <input type="text" id="name" name="name" type="text" class="form-control" class="form-control"
+                                                <input type="text" id="name" name="name" class="form-control" class="form-control"
                                                      placeholder="Name" value="{{($subCategory->name) ? $subCategory->name : ''}}">
                                                 @error('name')
                                                     <div class="text-danger">{{ $message }}</div>
@@ -57,6 +57,17 @@
                                                 @enderror
                                             </div>
                                         </div>
+
+                                        <div class="col-6">
+                                            <div class="form-group mandatory">
+                                                <label class="form-label" for="image">Upload File</label>
+                                                <input type="file" id="image" name="image" class="form-control" class="form-control">
+                                                @error('image')
+                                                    <div class="text-danger">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+
                                         <div class="col-12 d-flex mt-3">
                                             <button type="submit" class="btn btn-primary me-1 mb-1">Submit</button>
                                             <a href="{{route('sub-category.index')}}">
@@ -87,7 +98,11 @@
                 },
                 status: {
                     required: true, 
-                }
+                },
+                image: {
+                    required: true, 
+                    extension: "jpg,jpeg,png",
+                },
             },
         })
     });

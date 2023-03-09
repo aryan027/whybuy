@@ -60,6 +60,9 @@ class SubCategoryController extends Controller
             $subCategory->category_id = $request->category_id;
             $subCategory->status = $request->status;
             $subCategory->save();
+            if($request->hasFile('image') && $request->file('image')->isValid()){
+                $subCategory->addMediaFromRequest('image')->toMediaCollection('sub_category');
+            }
             return redirect(route('sub-category.index'))->with('success','SubCategory added Successfully');
         }catch(Exception $e) {
             abort(500);
@@ -115,6 +118,10 @@ class SubCategoryController extends Controller
                 $subCategory->category_id = $request->category_id;
                 $subCategory->status = $request->status;
                 $subCategory->save();
+                if($request->hasFile('image') && $request->file('image')->isValid()){
+                    $subCategory->clearMediaCollection('sub_category');
+                    $subCategory->addMediaFromRequest('image')->toMediaCollection('sub_category');
+                }
                 return redirect(route('sub-category.index'))->with('success','Category Updated Successfully');
             }
             return redirect()->back()->with('error','Something went to wrong!');

@@ -2,6 +2,7 @@
     <thead>
       <tr>
         <th>Id</th>
+        <th>Image</th>
         <th>Name</th>
         <th>Status</th>
         <th>Action</th>
@@ -11,6 +12,7 @@
         @forelse($category as $row)
             <tr>
                 <td>{{ $loop->iteration }}</td>
+                <td><img src="{{$row->getFirstMediaUrl('category', 'thumb')}}"  width="120px"></td>
                 <td>{{!empty($row->name) ? $row->name : '-'}}</td>
                 @if ($row->status == 1)
                 <td>
