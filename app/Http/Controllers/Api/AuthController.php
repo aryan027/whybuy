@@ -124,7 +124,6 @@ class AuthController extends Controller
         $otp = '123456';
         $token = md5($request->mobile . time());
         $send = Temp_token::create([
-            // 'name'=>$request['name'],
             'mobile' => $request['mobile'],
             'otp' => $otp,
             'token' => $token,
