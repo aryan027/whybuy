@@ -7,6 +7,8 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\PackageController;
 use App\Http\Controllers\Api\RentItemController;
 use App\Http\Controllers\Api\SubCategoryController;
+use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\CMSController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -49,6 +51,29 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
        Route::get('/item/list',[RentItemController::class,'rentItemList']);
     });
     Route::get('packages',[PackageController::class,'package_listing']);
+
+    // Users Details
+    Route::group(['prefix' => 'users'], function () {
+        Route::get('user-detail', [UserController::class, 'userDetail']);
+        Route::post('update-profile', [UserController::class, 'updateProfile']);
+        
+        //Address module 
+        Route::post('add-address', [UserController::class, 'addAddress']);
+        Route::get('get-address', [UserController::class, 'getAddress']);
+        Route::get('get-address-detail/{id}', [UserController::class, 'getAddressDetail']);
+        Route::put('update-address/{id}', [UserController::class, 'updateAddress']);
+        Route::delete('delete-address/{id}', [UserController::class, 'deleteAddress']);
+
+        Route::post('user-report', [UserController::class, 'userReport']);
+
+        Route::delete('delete-account', [UserController::class, 'deleteAccount']);
+    });
+
+    // CMS Modules
+    Route::group(['prefix' => 'cms'], function () {
+        // CMS
+        Route::get('get-cms', [CMSController::class, 'cms']);
+    });
 });
 
 Route::get('about-us',[AboutUsController::class,'AboutUs']);

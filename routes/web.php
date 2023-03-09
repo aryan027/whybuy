@@ -7,6 +7,8 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\SubCategoryController;
 use App\Http\Controllers\Admin\ChildCategoryController;
 use App\Http\Controllers\Admin\AdvertisementController;
+use App\Http\Controllers\Admin\CountryController;
+use App\Http\Controllers\Admin\CMSController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,6 +52,13 @@ Route::middleware(['auth'])->group(function () {
 
         // Advertisement module
         Route::resource('advertisement', AdvertisementController::class);
-        Route::put('advertisement-approve/{id}', [AdvertisementController::class,'advertisementApprove'])->name('advertisement.approve');        
+        Route::put('advertisement-approve/{id}', [AdvertisementController::class,'advertisementApprove'])->name('advertisement.approve');      
+        
+        //Country  module
+        Route::resource('country', CountryController::class);
+
+        // terms & condition or privercy policy  module
+        Route::resource('cms', CMSController::class);
+       
     });
 });

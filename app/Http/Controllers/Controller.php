@@ -9,16 +9,24 @@ use App\Models\Category;
 use App\Models\SubCategory;
 use App\Models\ChildCategory;
 use App\Models\Advertisement;
+use App\Models\User;
+use App\Models\Addresses;
+use App\Models\Countries;
+use App\Models\CMS;
 
 class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
     public function __construct()
     {
+        $this->user = new User();
         $this->category = new Category();
         $this->subCategory = new SubCategory();
         $this->childCategory = new ChildCategory();
         $this->advertisement = new Advertisement();
+        $this->addresses = new Addresses();
+        $this->countries = new Countries();
+        $this->cms = new CMS();
     }
     public function SuccessResponse($code,$message,$data=null){
 

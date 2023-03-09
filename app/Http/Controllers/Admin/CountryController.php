@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Validator;
 use Exception;
 
-class CategoryController extends Controller
+class CountryController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,15 +16,15 @@ class CategoryController extends Controller
     {
         try {
             if($request->ajax()){
-                $category = $this->category->orderBy('id','DESC')->get();
+                $categories = $this->countries->orderBy('id','DESC')->get();
                 $data['status'] = 1;
-                $data['categoryData'] = View('admin.category.data',compact('category'))->render();
+                $data['categoriesData'] = View('admin.country.data',compact('categories'))->render();
                 return $data;
             }
-            return view('admin.category.index');
+            return view('admin.country.index');
         }catch(Exception $e) {
             abort(500);
-        }
+        } 
     }
 
     /**
@@ -32,11 +32,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        try {
-            return view('admin.category.create');
-        }catch(Exception $e) {
-            abort(500);
-        }
+        return view('admin.country.create');
     }
 
     /**
@@ -46,21 +42,20 @@ class CategoryController extends Controller
     {
         try {
             $rule = [
-                'name' => 'required|unique:categories,name',
+                'name' => 'required|unique:countries,name',
+                'short_name' => 'required',
                 'status' => 'required',
             ];
             $valid = Validator::make($request->all(),$rule);
             if($valid->fails()){
                 return redirect()->back()->withErrors($valid->errors())->withInput();
             }
-            $category = $this->category;
-            $category->name = $request->name;
-            $category->status = $request->status;
-            $category->save();
-            if($request->hasFile('image') && $request->file('image')->isValid()){
-                $category->addMediaFromRequest('image')->toMediaCollection('category');
-            }
-            return redirect(route('category.index'))->with('success','Category added Successfully');
+            $countries = $this->countries;
+            $countries->name = $request->name;
+            $countries->short_name = $request->short_name;
+            $countries->status = $request->status;
+            $countries->save();
+            return redirect(route('country.index'))->with('success','Country added successfully');
         }catch(Exception $e) {
             abort(500);
         }
@@ -77,13 +72,13 @@ class CategoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $request, $id)
+    public function edit(string $id)
     {
         try {
             $id = decrypt($id);
-            $getCategory = $this->category->where('id',$id)->first();
-            if(!empty($getCategory)){
-                return view('admin.category.edit',compact('getCategory'));
+            $countries = $this->countries->where('id',$id)->first();
+            if(!empty($countries)){
+                return view('admin.country.edit',compact('countries'));
             }
             return redirect()->back()->with('error','Something went to wrong!');
         }catch(Exception $e) {
@@ -96,27 +91,24 @@ class CategoryController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $id = decrypt($id);
         try {
-            $id = decrypt($id);
             $rule = [
-                'name' => 'required|unique:categories,name,'.$id,
+                'name' => 'required|unique:countries,name,'.$id,
+                'short_name' => 'required',
                 'status' => 'required',
             ];
             $valid = Validator::make($request->all(),$rule);
             if($valid->fails()){
                 return redirect()->back()->withErrors($valid->errors())->withInput();
             }
-        
-            $category = $this->category->where('id',$id)->first();
-            if(!empty($category)){
-                $category->name = $request->name;
-                $category->status = $request->status;
-                $category->save();
-                if($request->hasFile('image') && $request->file('image')->isValid()){
-                    $category->clearMediaCollection('category');
-                    $category->addMediaFromRequest('image')->toMediaCollection('category');
-                }
-                return redirect(route('category.index'))->with('success','Category Updated Successfully');
+            $countries = $this->countries->where('id',$id)->first();
+            if(!empty($countries)){
+                $countries->name = $request->name;
+                $countries->short_name = $request->short_name;
+                $countries->status = $request->status;
+                $countries->save();
+                return redirect(route('country.index'))->with('success','Country updated successfully');
             }
             return redirect()->back()->with('error','Something went to wrong!');
         }catch(Exception $e) {
@@ -131,16 +123,16 @@ class CategoryController extends Controller
     {
         try {
             if($request->ajax()){
-                $categoryId = decrypt($id);
-                $category = $this->category->where('id',$categoryId)->first();
+                $countryId = decrypt($id);
+                $countries = $this->countries->where('id',$countryId)->first();
                 $data['status'] = 0;
-                if(!empty($category)){
-                    if($this->category::checkSubCategoryOrNot($category)){
-                        session()->flash("warning","This category provide by multiple sub category. So you can't delete this category.");
+                if(!empty($countries)){
+                    if($this->countries::checkAddressesOrNot($countries)){
+                        session()->flash("warning","This countries provide by multiple addresses. So you can't delete this addresses.");
                         $data['status'] = 2;
                     }
                     else{
-                        $category->delete();
+                        $countries->delete();
                         $data['status'] = 1;
                     }
                 }

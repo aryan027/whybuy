@@ -49,7 +49,19 @@
                 <li class="sidebar-item {{ Request::segment(2) === 'advertisement' ? 'active' : '' }}">
                     <a href="{{route('advertisement.index')}}" class='sidebar-link'>
                         <i class="bi bi-badge-ad"></i>
-                        <span>Advertisement</span>
+                        <span>Advertisement Request</span>
+                    </a>
+                </li> 
+                <li class="sidebar-item {{ Request::segment(2) === 'country' ? 'active' : '' }}">
+                    <a href="{{route('country.index')}}" class='sidebar-link'>
+                        <i class="bi bi-building"></i>
+                        <span>Country</span>
+                    </a>
+                </li> 
+                <li class="sidebar-item {{ Request::segment(2) === 'cms' ? 'active' : '' }}">
+                    <a href="{{route('cms.index')}}" class='sidebar-link'>
+                        <i class="bi bi-building"></i>
+                        <span>CMS</span>
                     </a>
                 </li> 
             </ul>

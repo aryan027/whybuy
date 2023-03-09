@@ -1,23 +1,23 @@
 
 @extends('admin.layout.master')
-@section('title', 'Child Category')
+@section('title', 'CMS')
 @section('content')
     <section class="section">
         <div class="card">
             <div class="card-header">
                 <div class="row">
                     <div class = "col-md-6">
-                        <h5 class="card-title">Child Category</h5>
+                        <h5 class="card-title">CMS</h5>
                     </div>
                     <div class = "col-md-6 text-end">
-                        <a href="{{route('child-category.create')}}">
-                            <button type="button" class="btn btn-primary">Add Child Category</button>
+                        <a href="{{route('cms.create')}}">
+                            <button type="button" class="btn btn-primary">Add CMS</button>
                         </a>
                     </div>
                 </div>
             </div>
             <div class="card-body">
-                <div class="table-responsive text-nowrap p-2" id="child_category">
+                <div class="table-responsive text-nowrap p-2" id="cms">
         
                 </div>
             </div>
@@ -29,17 +29,17 @@
     <script>
         var qstring = '';
         $(document).ready(function(){
-            getChildCategoryData(qstring);
+            getCMSData(qstring);
         });
 
-        function getChildCategoryData(qstring) {
+        function getCMSData(qstring) {
             $.ajax({
-                url: "{{ route('child-category.index')}}?"+qstring,
+                url: "{{ route('cms.index')}}?"+qstring,
                 dataType: 'json',
             }).done(function(data) {
                 if(data.status == 1){
-                    $('#child_category').html(data.childCategoryData);
-                    $('#childCategoryTable').DataTable({
+                    $('#cms').html(data.cmsData);
+                    $('#cmsTable').DataTable({
                         aLengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
                     });
                 }
@@ -47,24 +47,24 @@
             });
         }
 
-        $(document).on('click','#deleteChildCategory',function(){
+        $(document).on('click','#deleteCategory',function(){
             var categoryId = $(this).data('id')
             swal({
                 title: "Are you sure?",
-                text: "Once deleted, you will not be able to recover this child category!",
+                text: "Once deleted, you will not be able to recover this category!",
                 icon: "warning",
                 buttons: true,
                 dangerMode: true,
             })
             .then((willDelete) => {
                 if (willDelete) {
-                    deleteChildCategory(categoryId)
+                    deleteCategory(categoryId)
                 } 
             });
         });
 
-        function deleteChildCategory(categoryId){
-            var url = '{{ route("child-category.destroy", ":id") }}';
+        function deleteCategory(categoryId){
+            var url = '{{ route("category.destroy", ":id") }}';
             url = url.replace(':id', categoryId);
             $.ajax({
                 headers: {
@@ -75,10 +75,10 @@
                 dataType: 'json',
             }).done(function(data) {
                 if(data.status == 1){
-                    swal("Your child category has been deleted!", {
+                    swal("Your category has been deleted!", {
                         icon: "success",
                     });
-                    getChildCategoryData(qstring);
+                    getCMSData(qstring);
                 }else if(data.status == 2){
                     window.location.reload();
                 }else{
