@@ -93,6 +93,9 @@ class AdvertisementController extends Controller
                 $data['status'] = 0;
                 if(!empty($advertisement)){
                     $advertisement->approved = ($advertisement->approved == 0) ? 1 : 0;
+                    if($request->reason != ''){
+                        $advertisement->unapproved_reason = $request->reason;
+                    }
                     $advertisement->save();
                     $data['status'] = 1;
                 }

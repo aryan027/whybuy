@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\ChildCategoryController;
 use App\Http\Controllers\Admin\AdvertisementController;
 use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\CMSController;
+use App\Http\Controllers\Admin\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -60,5 +61,9 @@ Route::middleware(['auth'])->group(function () {
         // terms & condition or privercy policy  module
         Route::resource('cms', CMSController::class);
        
+        // users module
+        Route::resource('user', UserController::class);
+        Route::put('user-status/{id}', [UserController::class,'userStatus'])->name('user.status');      
+
     });
 });

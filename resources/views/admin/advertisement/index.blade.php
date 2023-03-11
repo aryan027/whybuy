@@ -44,17 +44,38 @@
 
         $(document).on('click','#approved',function(){
             var avd_id = $(this).data('id')
+            // swal({
+            //     title: "Are you sure?",
+            //     text: "You want to unapprove this advertisent!",
+            //     icon: "warning",
+            //     buttons: true,
+            //     dangerMode: true,
+            // })
+            // .then((willDelete) => {
+            //     if (willDelete) {
+            //         approvedAdvertisement(avd_id)
+            //     } 
+            // });
             swal({
                 title: "Are you sure?",
                 text: "You want to unapprove this advertisent!",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true,
-            })
-            .then((willDelete) => {
-                if (willDelete) {
-                    approvedAdvertisement(avd_id)
-                } 
+                input: 'select',
+                inputOptions: {
+                    'Unathorized User': 'Unathorized User',
+                    'Not a valid user': 'Not a valid user',
+                    'Not a valid mobile number': 'Not a valid mobile number'
+                },
+                inputPlaceholder: 'Select reason',
+                showCancelButton: true,
+                inputValidator: function (value) {
+                    return new Promise(function (resolve, reject) {
+                    if (value != '') {
+                        approvedAdvertisement(avd_id,value)
+                    } else {
+                        reject('You need to select reason :)')
+                    }
+                    })
+                }
             });
         });
 
@@ -63,18 +84,20 @@
             swal({
                 title: "Are you sure?",
                 text: "You want to approve this advertisent!",
-                icon: "warning",
+                type: 'warning',
                 buttons: true,
                 dangerMode: true,
+                showCancelButton: true,
+
             })
             .then((willDelete) => {
                 if (willDelete) {
-                    approvedAdvertisement(avd_id)
+                    approvedAdvertisement(avd_id,'')
                 } 
             });
         });
 
-        function approvedAdvertisement(avd_id){
+        function approvedAdvertisement(avd_id,reason){
             var url = '{{ route("advertisement.approve", ":id") }}';
             url = url.replace(':id', avd_id);
             $.ajax({
@@ -83,16 +106,19 @@
                 },
                 type : "PUT",
                 url: url,
+                data:{reason:reason},
                 dataType: 'json',
             }).done(function(data) {
                 if(data.status == 1){
-                    swal("Your status has been changed!", {
-                        icon: "success",
+                    swal({
+                        type: 'success',
+                        html: 'Your status has been changed!',
                     });
                     getAdvertisementData(qstring);
                 }else{
-                    swal("Something went to wrong!", {
-                        icon: "error",
+                    swal({
+                        type: 'error',
+                        html: 'Something went to wrong!',
                     });
                 }
             }).fail(function() {
