@@ -1,23 +1,23 @@
 
 @extends('admin.layout.master')
-@section('title', 'Country')
+@section('title', 'User')
 @section('content')
     <section class="section">
         <div class="card">
             <div class="card-header">
                 <div class="row">
                     <div class = "col-md-6">
-                        <h5 class="card-title">Country</h5>
+                        <h5 class="card-title">Users</h5>
                     </div>
-                    <div class = "col-md-6 text-end">
-                        <a href="{{route('country.create')}}">
-                            <button type="button" class="btn btn-primary">Add Country</button>
+                    {{-- <div class = "col-md-6 text-end">
+                        <a href="{{route('user.create')}}">
+                            <button type="button" class="btn btn-primary">Add User</button>
                         </a>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
             <div class="card-body">
-                <div class="table-responsive text-nowrap p-2" id="country">
+                <div class="table-responsive text-nowrap p-2" id="user">
         
                 </div>
             </div>
@@ -29,17 +29,17 @@
     <script>
         var qstring = '';
         $(document).ready(function(){
-            getCountryData(qstring);
+            getUserData(qstring);
         });
 
-        function getCountryData(qstring) {
+        function getUserData(qstring) {
             $.ajax({
-                url: "{{ route('country.index')}}?"+qstring,
+                url: "{{ route('user.index')}}?"+qstring,
                 dataType: 'json',
             }).done(function(data) {
                 if(data.status == 1){
-                    $('#country').html(data.categoriesData);
-                    $('#countryTable').DataTable({
+                    $('#user').html(data.userData);
+                    $('#userTable').DataTable({
                         aLengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
                     });
                 }
@@ -47,11 +47,11 @@
             });
         }
 
-        $(document).on('click','#deleteCountry',function(){
-            var countryId = $(this).data('id')
+        $(document).on('click','#active',function(){
+            var user_id = $(this).data('id')
             swal({
                 title: "Are you sure?",
-                text: "Once deleted, you will not be able to recover this country!",
+                text: "You want to inactive this user!",
                 type: 'warning',
                 buttons: true,
                 dangerMode: true,
@@ -59,30 +59,45 @@
             })
             .then((willDelete) => {
                 if (willDelete) {
-                    deleteCountry(countryId)
+                    activeUserStatus(user_id)
                 } 
             });
         });
 
-        function deleteCountry(countryId){
-            var url = '{{ route("country.destroy", ":id") }}';
-            url = url.replace(':id', countryId);
+        $(document).on('click','#inactive',function(){
+            var user_id = $(this).data('id');
+            swal({
+                title: "Are you sure?",
+                text: "You want to active this user!",
+                type: 'warning',
+                buttons: true,
+                dangerMode: true,
+                showCancelButton: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    activeUserStatus(user_id)
+                } 
+            });
+        });
+
+        function activeUserStatus(user_id){
+            var url = '{{ route("user.status", ":id") }}';
+            url = url.replace(':id', user_id);
             $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
-                type : "DELETE",
+                type : "PUT",
                 url: url,
                 dataType: 'json',
             }).done(function(data) {
                 if(data.status == 1){
                     swal({
                         type: 'success',
-                        html: 'Country has been deleted!',
+                        html: 'Your status has been changed!',
                     });
-                    getCountryData(qstring);
-                }else if(data.status == 2){
-                    window.location.reload();
+                    getUserData(qstring);
                 }else{
                     swal({
                         type: 'error',
@@ -92,6 +107,7 @@
             }).fail(function() {
             });
         }
+
 
     </script>
 @endpush

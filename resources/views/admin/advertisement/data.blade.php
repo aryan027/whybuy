@@ -30,10 +30,10 @@
                 @endif
                 @if ($row->approved == 1)
                 <td>
-                    <span class="badge bg-success approved-status" data-id="{{encrypt($row->id)}}" id="approved">Approved</span>
+                    <span class="badge bg-success pointer-status" data-id="{{encrypt($row->id)}}" id="approved">Approved</span>
                 </td>
                 @else
-                  <td><span class="badge bg-warning approved-status" data-id="{{encrypt($row->id)}}" id="unapproved">Unapproved</span></td>
+                  <td><span class="badge bg-warning pointer-status" data-id="{{encrypt($row->id)}}" id="unapproved">Unapproved</span></td>
                 @endif
                 <td>
                     <a href="{{route('advertisement.show',encrypt($row->id))}}">

@@ -44,8 +44,8 @@
                                         </div>
                                         
                                         <div class="col-6">
-                                            <div class="form-group mandatory">
-                                                <label class="form-label" for="image">Upload File</label>
+                                            <div class="form-group">
+                                                <label for="image">Upload File</label>
                                                 <input type="file" id="image" name="image" class="form-control" class="form-control">
                                                 @error('image')
                                                     <div class="text-danger">{{ $message }}</div>
@@ -80,11 +80,7 @@
                 },
                 status: {
                     required: true, 
-                },
-                image: {
-                    required: true, 
-                    extension: "jpg,jpeg,png",
-                },
+                }
             },
         })
     });

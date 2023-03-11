@@ -52,9 +52,10 @@
             swal({
                 title: "Are you sure?",
                 text: "Once deleted, you will not be able to recover this sub category!",
-                icon: "warning",
+                type: 'warning',
                 buttons: true,
                 dangerMode: true,
+                showCancelButton: true,
             })
             .then((willDelete) => {
                 if (willDelete) {
@@ -75,15 +76,17 @@
                 dataType: 'json',
             }).done(function(data) {
                 if(data.status == 1){
-                    swal("Your sub category has been deleted!", {
-                        icon: "success",
+                    swal({
+                        type: 'success',
+                        html: 'Sub category has been deleted!',
                     });
                     getSubCategoryData(qstring);
                 }else if(data.status == 2){
                     window.location.reload();
                 }else{
-                    swal("Something went to wrong!", {
-                        icon: "error",
+                    swal({
+                        type: 'error',
+                        html: 'Something went to wrong!',
                     });
                 }
             }).fail(function() {

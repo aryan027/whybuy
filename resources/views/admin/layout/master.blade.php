@@ -21,6 +21,10 @@
 
     {{-- toastr link --}}
     <link rel="stylesheet" type="text/css" href="{{ URL::to('https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css')}}">
+
+    {{-- sweetalert --}}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.5/sweetalert2.min.css" rel="stylesheet"/>
+
     @yield('head')
 </head>
 <body>
@@ -52,7 +56,9 @@
     <script src="{{ URL::to('https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js')}}"></script>
 
     {{-- sweetalert --}}
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    {{-- <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script> --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.5/sweetalert2.min.js"></script>
+
     <script src="https://cdn.ckeditor.com/ckeditor5/34.2.0/classic/ckeditor.js"></script>
     <script src="{{asset('assets/js/pages/ckeditor.js')}}"></script>
 

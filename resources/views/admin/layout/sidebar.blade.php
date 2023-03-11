@@ -60,10 +60,16 @@
                 </li> 
                 <li class="sidebar-item {{ Request::segment(2) === 'cms' ? 'active' : '' }}">
                     <a href="{{route('cms.index')}}" class='sidebar-link'>
-                        <i class="bi bi-building"></i>
+                        <i class="bi bi-file-earmark-text"></i>
                         <span>CMS</span>
                     </a>
                 </li> 
+                <li class="sidebar-item {{ Request::segment(2) === 'user' ? 'active' : '' }}">
+                    <a href="{{route('user.index')}}" class='sidebar-link'>
+                        <i class="bi bi-person"></i>
+                        <span>Users</span>
+                    </a>
+                </li>
             </ul>
         </div>
     </div>
