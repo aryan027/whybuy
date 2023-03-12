@@ -202,7 +202,7 @@ class WalletController extends Controller
                 if ($validator->fails()) {
                     return $this->ErrorResponse(400, $validator->errors()->first());
                 }
-                $rent = RentItem::where(['id' => $request['rent_id'], 'status' => 'pending'])->first();
+                $rent = RentItem::where(['id' => $request['rent_id'], 'status' => 0])->first();
                 if (empty($rent)) {
                     return $this->ErrorResponse(200, 'Rental product not found');
                 }
