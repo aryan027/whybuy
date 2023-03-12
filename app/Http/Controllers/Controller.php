@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Wallet;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
@@ -27,6 +28,7 @@ class Controller extends BaseController
         $this->addresses = new Addresses();
         $this->countries = new Countries();
         $this->cms = new CMS();
+        $this->wallet = new Wallet();
     }
     public function SuccessResponse($code,$message,$data=null){
 
