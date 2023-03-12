@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Validator;
 class WalletController extends Controller
 {
 
-    protected array|Collection $wallet;
+    protected  $wallet;
 
     public function __construct() {
         $this->wallet = Wallet::where('user_id',auth()->id())->first();
@@ -163,7 +163,8 @@ class WalletController extends Controller
 
     }
 
-    public function productwise_wallet(){
+    public function product_wise_wallet_history(){
+        dd('hell');
         $history = TransactionHistory::whereNotNull('ad_id')->where(['user_id' => auth()->id()])->get();
         return $this->SuccessResponse(200,'Product wise wallet history ..!',$history);
     }

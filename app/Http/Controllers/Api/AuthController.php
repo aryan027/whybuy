@@ -175,4 +175,6 @@ class AuthController extends Controller
         return $this->SuccessResponse(200, 'password created successfully ..!');
 
     }
+
+
 }
