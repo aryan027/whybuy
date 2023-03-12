@@ -163,9 +163,13 @@ class WalletController extends Controller
     }
 
     public function product_wise_wallet_history(){
-        dd('hell');
         $history = TransactionHistory::whereNotNull('ad_id')->where(['user_id' => auth()->id()])->get();
         return $this->SuccessResponse(200,'Product wise wallet history ..!',$history);
+    }
+
+    public function add_money_history(){
+        $history= TransactionHistory::whereNull('ad_id')->where(['user_id' => auth()->id()])->get();
+        return $this->SuccessResponse(200,'money added history fetc..!',$history);
     }
 
 
