@@ -221,7 +221,6 @@ class WalletController extends Controller
                         'amount' => $rent['block'],
                         'user_id' => auth()->id(),
                         'remark' => 'released blocked amount',
-                        'payload' => 'nullable',
                         'ad_id' => $rent['ads_id'],
                         'txn_status' => 'success'
                     ]);
