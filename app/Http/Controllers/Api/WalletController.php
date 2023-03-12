@@ -152,6 +152,7 @@ class WalletController extends Controller
                     'user_id'=>auth()->id(),
                     'balance'=>0,
                     'hold'=>0,
+                    'status'=>1
                 ]);
                 if($wallet){
                     return $this->SuccessResponse(200,'balance added successfully ..!',$wallet);
