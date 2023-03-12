@@ -48,6 +48,14 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post('/create', [AdController::class, 'createAdvertisement']);
         Route::get('/', [AdController::class, 'myAds']);
     });
+
+    Route::group(['prefix' =>'wallet'],function (){
+        Route::get('/',[\App\Http\Controllers\Api\WalletController::class,'wallet_details']);
+        Route::post('/ad/rent',[\App\Http\Controllers\Api\WalletController::class,'wallet_transaction']);
+        Route::post('/add/money',[\App\Http\Controllers\Api\WalletController::class,'add_balance']);
+        Route::post('/create',[\App\Http\Controllers\Api\WalletController::class,'create_wallet']);
+        Route::get('/product/wise/history',[\App\Http\Controllers\Api\WalletController::class,'productwise_wallet']);
+    });
     Route::group(['prefix'=>'rent'],function(){
        Route::Post('/item',[RentItemController::class,'rentItem']) ;
        Route::get('/item/list',[RentItemController::class,'rentItemList']);
@@ -68,8 +76,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::group(['prefix' => 'users'], function () {
         Route::get('user-detail', [UserController::class, 'userDetail']);
         Route::post('update-profile', [UserController::class, 'updateProfile']);
-        
-        //Address module 
+
+        //Address module
         Route::post('add-address', [UserController::class, 'addAddress']);
         Route::get('get-address', [UserController::class, 'getAddress']);
         Route::get('get-address-detail/{id}', [UserController::class, 'getAddressDetail']);

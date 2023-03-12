@@ -54,7 +54,7 @@ class AdController extends Controller
         $request['ad_id'] = IdGenerator::generate(['table' => 'advertisements','field'=>'ad_id', 'length' => 16, 'prefix' => date('Y').'-'.auth()->id().'-']);
         $create = Advertisement::create($request->all());
         if (!$create) {
-            return $this->ErrorResponse(500, 'Unable to Insert records', $create);
+            return $this->ErrorResponse(500, 'Unable to Insert records');
         }
         if ($request->hasFile('image')) {
             foreach ($request->image as $image)
