@@ -112,7 +112,7 @@ class WalletController extends Controller
                 if($validator->fails()){
                     return $this->ErrorResponse(400,$validator->errors()->first());
                 }
-                $wallet = Wallet::where('user_id',auth()->id())->first();;
+                $wallet = Wallet::where('user_id',auth()->id())->first();
                 if(!$wallet){
                     return $this->ErrorResponse(400,'Wallet not found ..!');
                 }
