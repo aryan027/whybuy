@@ -3,12 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
 use App\Models\TransactionHistory;
 use App\Models\Wallet;
 use Haruncpi\LaravelIdGenerator\IdGenerator;
 use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -104,7 +102,6 @@ class WalletController extends Controller
             $user = auth()->user();
             if(!empty($user)){
                 $validator= Validator::make($request->all,[
-                    'type'=>'required|in:0,1,2',
                     'amount'=>'required',
                     'remark'=>'nullable',
                     'payload'=>'nullable',
