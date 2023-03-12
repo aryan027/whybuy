@@ -123,7 +123,7 @@ class WalletController extends Controller
                     if (!$trans) {
                         return $this->ErrorResponse(500, 'Something went wrong while transaction ..!');
                     }
-                    $wallet->update(['balance',$wallet['balance']+$request['amount']]);
+                    $wallet->update(['balance'=>$wallet['balance']+$request['amount']]);
                     return $this->SuccessResponse(200,'balance added successfully ..!',$trans);
             }
             return $this->ErrorResponse(500, 'Something Went Wrong');
