@@ -213,7 +213,7 @@ class WalletController extends Controller
                 }
                 $wallet = Wallet::where('user_id', auth()->id())->first();
                 $update = $rent->update([
-                    'status' => 'cancel',
+                    'status' => 2,
                 ]);
                 if ($update) {
                     $trans = TransactionHistory::create([
