@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Advertisement;
 use App\Models\TransactionHistory;
 use App\Models\Wallet;
 use Haruncpi\LaravelIdGenerator\IdGenerator;
@@ -50,7 +51,7 @@ class WalletController extends Controller
                     return $this->ErrorResponse(400,'Wallet not found ..!');
                 }
                 $wallet = Wallet::where('user_id',auth()->id())->first();
-                $ad= $this->advertisement->find($request['ad_id']);
+                $ad= Advertisement::find($request['ad_id']);
                 if(empty($ad)){
                     return $this->ErrorResponse(400,'Ad not found');
                 }
