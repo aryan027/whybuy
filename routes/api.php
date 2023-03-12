@@ -54,7 +54,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post('/ad/rent',[\App\Http\Controllers\Api\WalletController::class,'wallet_transaction']);
         Route::post('/add/money',[\App\Http\Controllers\Api\WalletController::class,'add_balance']);
         Route::post('/create',[\App\Http\Controllers\Api\WalletController::class,'create_wallet']);
-        Route::get('/product/wise/history',[\App\Http\Controllers\Api\WalletController::class,'productwise_wallet']);
+        Route::get('product/wise/history',[\App\Http\Controllers\Api\WalletController::class,'product_wise_wallet_history']);
     });
     Route::group(['prefix'=>'rent'],function(){
        Route::Post('/item',[RentItemController::class,'rentItem']) ;
@@ -97,3 +97,4 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 });
 
 Route::get('about-us',[AboutUsController::class,'AboutUs']);
+Route::get('authentication',[AuthController::class,'authentication'])->name('authentication');

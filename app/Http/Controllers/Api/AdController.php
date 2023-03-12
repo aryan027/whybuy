@@ -70,7 +70,7 @@ class AdController extends Controller
         return $this->SuccessResponse(200, 'Advertisement Fetched Successfully', $ads);
     }
     public function myAds() {
-        $ads = Advertisement::with('subCategory', 'category')->where(['user_id' => auth()->id(),'status' => true, 'approved' => true, 'published' => true])->latest()->get();
+        $ads = Advertisement::with('subCategory', 'category')->where(['user_id' => auth()->id()])->latest()->get();
         return $this->SuccessResponse(200, 'Advertisement Fetched Successfully', $ads);
     }
 
