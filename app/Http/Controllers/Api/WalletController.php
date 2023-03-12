@@ -18,11 +18,14 @@ class WalletController extends Controller
     protected  $wallet;
 
     public function __construct() {
-        $this->wallet = Wallet::where('user_id',auth()->id())->get()->first();
+        $this->wallet = Wallet::where('user_id',auth()->id())->first();
     }
 
     public function wallet_details() {
         try {
+            if(empty($this->wallet)){
+                return $this->ErrorResponse(400,"Wallet not found");
+            }
             return $this->SuccessResponse(200, 'Wallet Fetched', $this->wallet);
         } catch (Exception $exception) {
             logger('error occurred in Wallet fetching process');
