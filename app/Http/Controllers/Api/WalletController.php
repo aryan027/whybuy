@@ -23,10 +23,11 @@ class WalletController extends Controller
 
     public function wallet_details() {
         try {
+            $wallet= Wallet::where('user_id',auth()->id())->first();
             if(empty($this->wallet)){
                 return $this->ErrorResponse(400,"Wallet not found");
             }
-            return $this->SuccessResponse(200, 'Wallet Fetched', $this->wallet);
+            return $this->SuccessResponse(200, 'Wallet Fetched', $wallet);
         } catch (Exception $exception) {
             logger('error occurred in Wallet fetching process');
             logger(json_encode($exception));
