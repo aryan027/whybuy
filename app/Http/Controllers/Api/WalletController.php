@@ -18,7 +18,7 @@ class WalletController extends Controller
     protected  $wallet;
 
     public function __construct() {
-        $this->wallet = Wallet::where('user_id',auth()->id())->first();
+        $this->wallet = Wallet::where('user_id',auth()->id())->get()->first();
     }
 
     public function wallet_details() {
