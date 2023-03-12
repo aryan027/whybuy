@@ -27,7 +27,10 @@ class RentItemController extends Controller
         if($validator->fails()){
             return $this->ErrorResponse(400,$validator->errors()->first());
         }
-
+        $ad = Advertisement::find($request->ads_id);
+        if (empty($ad)) {
+            return $this->ErrorResponse(400, 'Ad not found');
+        }
         $item= RentItem::create([
             'ads_id'=>$request->ads_id,
             'user_id'=>auth()->id(),
@@ -35,6 +38,7 @@ class RentItemController extends Controller
             'start'=>date('y-m-d h:m:s',strtotime($request->start)),
             'end' =>date('y-m-d h:m:s',strtotime($request->end)),
             'price'=>$request->price,
+            'block'=> $ad['deposit_amount'],
             'description'=>$request->description,
             'purpose'=>$request->purpose
         ]);
