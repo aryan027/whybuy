@@ -45,7 +45,7 @@ class WalletController extends Controller
                     'amount' => 'required',
                     'remark' => 'nullable',
                     'payload' => 'nullable',
-                    'ad_id' => 'nullable',
+                    'rent_id' => 'required',
                     'txn_status' => 'nullable'
                 ]);
                 if ($validator->fails()) {
@@ -56,13 +56,17 @@ class WalletController extends Controller
                     return $this->ErrorResponse(400, 'Wallet not found ..!');
                 }
                 $wallet = Wallet::where('user_id', auth()->id())->first();
-                $ad = Advertisement::find($request['ad_id']);
+                $rent = RentItem::find($request['rent_id']);
+                if (empty($rent)) {
+                    return $this->ErrorResponse(400, 'Rental product not found');
+                }
+                $ad = Advertisement::find($rent['ads_id']);
                 if (empty($ad)) {
                     return $this->ErrorResponse(400, 'Ad not found');
                 }
                 $this->check_balance($ad, $wallet);
                 if (!empty($ad['id'])) {
-                    $wallet->update(['balance' => $wallet['balance'] - $ad['deposit_amount'], 'hold' => $ad['deposit_amount']]);
+                    $wallet->update(['balance' => $wallet['balance'] - $rent['block'], 'hold' => $rent['block']]);
                     $request['type'] = 0;
                     $request['user_id'] = auth()->id();
                     $request['txn_id'] = IdGenerator::generate(['table' => 'transaction_histories', 'field' => 'txn_id', 'length' => 16, 'prefix' => date('Y') . '-' . auth()->id() . '-']);
