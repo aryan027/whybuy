@@ -45,10 +45,11 @@ class WalletController extends Controller
                 if($validator->fails()){
                     return $this->ErrorResponse(400,$validator->errors()->first());
                 }
-                $wallet = $this->wallet->where('user_id',auth()->id())->first();
-                if(!$wallet){
+
+                if(! Wallet::where('user_id',auth()->id())->exists()){
                     return $this->ErrorResponse(400,'Wallet not found ..!');
                 }
+                $wallet = $this->wallet->where('user_id',auth()->id())->first();
                 $ad= $this->advertisement->find($request['ad_id']);
                 if(empty($ad)){
                     return $this->ErrorResponse(400,'Ad not found');
