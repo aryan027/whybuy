@@ -34,7 +34,7 @@ class WalletController extends Controller
         try {
             $user = auth()->user();
             if(!empty($user)){
-                $validator= Validator::make($request->all,[
+                $validator= Validator::make($request->all(),[
                     'type'=>'required|in:0,1,2',
                     'amount'=>'required',
                     'remark'=>'nullable',
