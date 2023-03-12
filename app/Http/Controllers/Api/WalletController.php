@@ -80,6 +80,7 @@ class WalletController extends Controller
             }
             return $this->ErrorResponse(500, 'Something Went Wrong');
         } catch (Exception $exception) {
+
             logger('error occurred in Wallet fetching process');
             logger(json_encode($exception));
             return $this->ErrorResponse(500, 'Something Went Wrong');
