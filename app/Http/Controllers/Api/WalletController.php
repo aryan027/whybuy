@@ -197,21 +197,22 @@ class WalletController extends Controller
             $user = auth()->user();
             if (!empty($user)) {
                 $validator = Validator::make($request->all(), [
-                    'rant_id' => 'required',
+                    'rent_id' => 'required',
                 ]);
                 if ($validator->fails()) {
                     return $this->ErrorResponse(400, $validator->errors()->first());
                 }
-
-                $ad = Advertisement::find($request['ad_id']);
-                if (empty($ad)) {
-                    return $this->ErrorResponse(200, 'Ad not found');
-                }
-
                 $rent = RentItem::where(['id' => $request['rent_id'], 'status' => 'pending'])->first();
                 if (empty($rent)) {
                     return $this->ErrorResponse(200, 'Rental product not found');
                 }
+
+                $ad = Advertisement::find($rent['ads_id']);
+                if (empty($ad)) {
+                    return $this->ErrorResponse(200, 'Ad not found');
+                }
+
+
                 if (Wallet::where('user_id', auth()->id())->exists()) {
                     return $this->ErrorResponse(200, 'Wallet already created ..!');
                 }
