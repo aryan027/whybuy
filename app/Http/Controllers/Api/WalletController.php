@@ -211,11 +211,6 @@ class WalletController extends Controller
                 if (empty($ad)) {
                     return $this->ErrorResponse(200, 'Ad not found');
                 }
-
-
-                if (Wallet::where('user_id', auth()->id())->exists()) {
-                    return $this->ErrorResponse(200, 'Wallet already created ..!');
-                }
                 $wallet = Wallet::where('user_id', auth()->id())->first();
                 $update = $rent->update([
                     'status' => 'cancel',
