@@ -69,6 +69,7 @@ class WalletController extends Controller
                     $wallet->update(['balance' => $wallet['balance'] - $rent['block'], 'hold' => $rent['block']]);
                     $request['type'] = 0;
                     $request['user_id'] = auth()->id();
+                    $request['rent_id'] = $rent['ads_id'];
                     $request['txn_id'] = IdGenerator::generate(['table' => 'transaction_histories', 'field' => 'txn_id', 'length' => 16, 'prefix' => date('Y') . '-' . auth()->id() . '-']);
                     $trans = TransactionHistory::create($request->all());
                     if (!$trans) {
