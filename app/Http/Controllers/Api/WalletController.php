@@ -49,7 +49,7 @@ class WalletController extends Controller
                 if(! Wallet::where('user_id',auth()->id())->exists()){
                     return $this->ErrorResponse(400,'Wallet not found ..!');
                 }
-                $wallet = $this->wallet->where('user_id',auth()->id())->first();
+                $wallet = Wallet::where('user_id',auth()->id())->first();
                 $ad= $this->advertisement->find($request['ad_id']);
                 if(empty($ad)){
                     return $this->ErrorResponse(400,'Ad not found');
