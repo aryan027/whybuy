@@ -55,7 +55,7 @@ class WalletController extends Controller
                 if(empty($ad)){
                     return $this->ErrorResponse(400,'Ad not found');
                 }
-                $this->check_balance($ad['id']);
+                $this->check_balance($ad,$wallet);
                 if(!empty($ad['id'])){
                     $wallet->update(['balance'=>$wallet['balance']-$ad['deposit_amount'],'hold'=>$ad['deposit_amount']]);
                     $request['type']=0;
@@ -81,10 +81,8 @@ class WalletController extends Controller
      * @return bool|\Illuminate\Http\JsonResponse
      * checking rentability
      */
-    public function check_balance($ad_id)
+    public function check_balance($ad,$wallet)
     {
-        $ad= $this->advertisement->find($ad_id);
-        $wallet= $this->wallet->where('user_id',auth()->id())->first();
         if($ad['deposit_amount'] == $wallet['balance']){
             return true;
         }
