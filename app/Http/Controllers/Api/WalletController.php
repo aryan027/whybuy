@@ -145,7 +145,7 @@ class WalletController extends Controller
         try {
             $user = auth()->user();
             if(!empty($user)){
-                if(Wallet::where('user_id',auth()->id())->exist()){
+                if(Wallet::where('user_id',auth()->id())->exists()){
                     return $this->ErrorResponse(400,'Wallet already created ..!');
                 }
                 $wallet= Wallet::create([
