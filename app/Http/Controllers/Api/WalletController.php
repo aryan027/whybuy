@@ -224,6 +224,7 @@ class WalletController extends Controller
                     $request['remark'] = 'released blocked amount';
                     $request['txn_id'] = IdGenerator::generate(['table' => 'transaction_histories', 'field' => 'txn_id', 'length' => 16, 'prefix' => date('Y') . '-' . auth()->id() . '-']);
                     $trans = TransactionHistory::create($request->all());
+                    dd($request);
                     if ($trans) {
                         $wallet->update(['balance' => $wallet['balance'] + $rent['block'], 'hold' => $wallet['hold'] - $rent['block']]);
                     }
