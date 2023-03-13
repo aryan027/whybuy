@@ -227,10 +227,11 @@ class WalletController extends Controller
                     $trans = TransactionHistory::create($request->all());
                     if ($trans) {
                         $wallet->update(['balance' => $wallet['balance'] + $rent['block'], 'hold' => $wallet['hold'] - $rent['block']]);
+                        return $this->SuccessResponse(200, 'Amount release successfully ..!');
                     }
                 }
             }
-            return $this->ErrorResponse(500, 'Something Went Wrong');
+
         } catch (Exception $exception) {
             logger('error occurred in releasing amount  fetching process');
             logger(json_encode($exception));
