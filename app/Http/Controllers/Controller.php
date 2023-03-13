@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Models\Addresses;
 use App\Models\Countries;
 use App\Models\CMS;
+use App\Models\RentalAgreement;
 
 class Controller extends BaseController
 {
@@ -29,6 +30,7 @@ class Controller extends BaseController
         $this->countries = new Countries();
         $this->cms = new CMS();
         $this->wallet = new Wallet();
+        $this->rentalAgreement = new RentalAgreement();
     }
     public function SuccessResponse($code,$message,$data=null){
 

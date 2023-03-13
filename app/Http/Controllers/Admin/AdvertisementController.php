@@ -15,7 +15,7 @@ class AdvertisementController extends Controller
     {
         try {
             if($request->ajax()){
-                $advertisement = $this->advertisement->where('published',$this->advertisement::IS_PUBLISHED)->orderBy('id','DESC')->get();
+                $advertisement = $this->advertisement->orderBy('id','DESC')->get();
                 $data['status'] = 1;
                 $data['advertisementData'] = View('admin.advertisement.data',compact('advertisement'))->render();
                 return $data;
