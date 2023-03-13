@@ -46,6 +46,10 @@ class Advertisement extends Model implements HasMedia
         return $this->belongsTo(RentItem::class,'ads_id');
     }
 
+    public function user(){
+        return $this->belongsTo(User::class,'user_id');
+    }
+
     public function registerMediaConversions(Media $media = null): void
     {
         $this->addMediaConversion('thumb')

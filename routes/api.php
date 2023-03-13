@@ -42,11 +42,21 @@ Route::group(['prefix' => 'sub-category'], function () {
     Route::get('/{cid}', [SubCategoryController::class, 'subCategoriesById']);
     Route::get('/information/{sid}', [SubCategoryController::class, 'subCategoryInfo']);
 });
-Route::get('ads', [AdController::class, 'adsListing']);
+
+Route::group(['middleware' => 'auth:sanctum'], function () {
+    Route::group(['prefix' => 'ads'], function () {
+        Route::get('/', [AdController::class, 'adsListing']);
+        Route::post('advertisement-detail', [AdController::class, 'AdvertisementDetail']);
+        Route::post('owner-profile', [AdController::class, 'ownerProfile']);
+    });
+});
+
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::group(['prefix' => 'my-ads'], function () {
         Route::post('/create', [AdController::class, 'createAdvertisement']);
+        Route::post('/update', [AdController::class, 'updateAdvertisement']);
         Route::get('/', [AdController::class, 'myAds']);
+        Route::post('/published', [AdController::class, 'published']);
     });
 
     Route::group(['prefix' =>'wallet'],function (){
@@ -58,9 +68,16 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get('product/wise/history',[\App\Http\Controllers\Api\WalletController::class,'product_wise_wallet_history']);
         Route::get('money/history',[\App\Http\Controllers\Api\WalletController::class,'add_money_history']);
     });
-    Route::group(['prefix'=>'rent'],function(){
+       Route::group(['prefix'=>'rent'],function(){
        Route::Post('/item',[RentItemController::class,'rentItem']) ;
-       Route::get('/item/list',[RentItemController::class,'rentItemList']);
+       Route::get('/item/rent-detail',[RentItemController::class,'rentDetail']);
+       Route::post('/timeslot',[RentItemController::class,'timeSlot']) ;
+       Route::get('/item/list',[RentItemController::class,'myRentItemList']);
+       Route::get('/item/rent-provide-list',[RentItemController::class,'provideRentItemList']);
+       Route::get('/item/agreement-form',[RentItemController::class,'agreementForm']);
+       Route::post('/item/owner-confirm-agreement',[RentItemController::class,'ownerConfirmAgreement']);
+       Route::post('/item/user-accept-agreement',[RentItemController::class,'userAcceptAgreement']);
+       
     });
     Route::get('packages',[PackageController::class,'package_listing']);
     Route::post('add/favourite',[FavouriteController::class,'addToFavourite']);
@@ -78,8 +95,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::group(['prefix' => 'users'], function () {
         Route::get('user-detail', [UserController::class, 'userDetail']);
         Route::post('update-profile', [UserController::class, 'updateProfile']);
-
-        //Address module
+        Route::post('update-profile-picture', [UserController::class, 'updateProfilePicture']);
+        
+        //Address module 
         Route::post('add-address', [UserController::class, 'addAddress']);
         Route::get('get-address', [UserController::class, 'getAddress']);
         Route::get('get-address-detail/{id}', [UserController::class, 'getAddressDetail']);

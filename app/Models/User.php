@@ -69,4 +69,12 @@ class User extends Authenticatable implements HasMedia
         return "{$this->fname} {$this->lname}";
     }
 
+    /** get user all advertisement
+     * @return HasMany
+    */
+    public function getPublishedAdv()
+    {
+        return $this->hasMany(Advertisement::class, 'user_id', 'id');
+    }
+
 }

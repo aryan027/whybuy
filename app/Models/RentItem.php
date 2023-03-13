@@ -14,8 +14,12 @@ class RentItem extends Model
         return $this->belongsTo(Advertisement::class,'ads_id');
     }
 
-    public function wants(){
+    public function users(){
         return $this->belongsTo(User::class,'user_id');
+    }
+
+    public function owners(){
+        return $this->belongsTo(User::class,'owner_id');
     }
 
 }

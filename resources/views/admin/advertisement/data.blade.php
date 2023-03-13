@@ -9,6 +9,7 @@
         <th>Brand</th>
         <th>Status</th>
         <th>Approved Status</th>
+        <th>Is Published</th>
         <th>Action</th>
       </tr>
     </thead>
@@ -34,6 +35,13 @@
                 </td>
                 @else
                   <td><span class="badge bg-warning pointer-status" data-id="{{encrypt($row->id)}}" id="unapproved">Unapproved</span></td>
+                @endif
+                @if ($row->published == 1)
+                <td>
+                    <span class="badge bg-success" data-id="{{encrypt($row->id)}}">Yes</span>
+                </td>
+                @else
+                  <td><span class="badge bg-danger" data-id="{{encrypt($row->id)}}">No</span></td>
                 @endif
                 <td>
                     <a href="{{route('advertisement.show',encrypt($row->id))}}">

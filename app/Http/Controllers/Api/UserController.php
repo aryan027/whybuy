@@ -67,6 +67,35 @@ class UserController extends Controller
         }
    }
 
+   // Update Profile Picture
+   public function updateProfilePicture(Request $request)
+   {
+        try {
+            $user = auth()->user();
+            if(!empty($user)){
+                $validator= Validator::make($request->all(),[
+                    'profile_picture'=>'required|mimes:jpeg,png,jpg',
+                ]);
+                if($validator->fails()){
+                    return $this->ErrorResponse(400,$validator->errors()->first());
+                }
+                if($request->hasFile('profile_picture') && $request->file('profile_picture')->isValid()){
+                    $user->clearMediaCollection('profile_picture');
+                    $user->addMediaFromRequest('profile_picture')->toMediaCollection('profile_picture');
+                }
+                $user->image = $user->getFirstMediaUrl('profile_picture');
+                unset($user->media);
+                return $this->SuccessResponse(200, 'User Profile Pricture Updated Successfully',$user);
+            }
+            return $this->ErrorResponse(500, 'Something Went Wrong');
+        } catch (Exception $exception) {
+            logger('error occurred in addresses fetching process');
+            logger(json_encode($exception));
+            return $this->ErrorResponse(500, 'Something Went Wrong');
+        }
+   }    
+
+
     // add user
    public function addAddress(Request $request)
    {
