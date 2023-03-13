@@ -216,17 +216,15 @@ class WalletController extends Controller
                     'status' => 2,
                 ]);
                 if ($update) {
-                    $id= IdGenerator::generate(['table' => 'transaction_histories', 'field' => 'txn_id', 'length' => 16, 'prefix' => date('Y') . '-' . auth()->id() . '-']);
-                    $trans = TransactionHistory::create([
-                        'type' => 1,
-                        'txn_id' => $id,
-                        'amount' => $rent['block'],
-                        'user_id' => auth()->id(),
-                        'remark' => 'released blocked amount',
-                        'ad_id' => $rent['ads_id'],
-                        'rent_id' => $request['rent_id'],
-                        'txn_status' => 'success'
-                    ]);
+
+                    $request['type'] = 1;
+                    $request['user_id'] = auth()->id();
+                    $request['amount'] = $rent['block'];
+                    $request['ad_id'] = $rent['ads_id'];
+                    $request['remark'] = 'released blocked amount';
+                    $request['txn_id'] = IdGenerator::generate(['table' => 'transaction_histories', 'field' => 'txn_id', 'length' => 16, 'prefix' => date('Y') . '-' . auth()->id() . '-']);
+                    $trans = TransactionHistory::create($request->all());
+                    dd($request);
                     if ($trans) {
                         $wallet->update(['balance' => $wallet['balance'] + $rent['block'], 'hold' => $wallet['hold'] - $rent['block']]);
                     }
