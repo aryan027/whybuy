@@ -213,6 +213,7 @@ class RentItemController extends Controller
             logger(json_encode($exception));
             return $this->ErrorResponse(500, 'Something Went Wrong');
         }
+        
     }
 
     // Owner Confirm Agreement
