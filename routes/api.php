@@ -77,9 +77,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
        Route::get('/item/agreement-form',[RentItemController::class,'agreementForm']);
        Route::post('/item/owner-confirm-agreement',[RentItemController::class,'ownerConfirmAgreement']);
        Route::post('/item/user-accept-agreement',[RentItemController::class,'userAcceptAgreement']);
-       
+
     });
     Route::get('packages',[PackageController::class,'package_listing']);
+    Route::post('subscribe',[PackageController::class,'subscription']);
+    Route::get('subscribe/list',[PackageController::class,'subscriptionList']);
     Route::post('add/favourite',[FavouriteController::class,'addToFavourite']);
     Route::get('favourite/list',[FavouriteController::class,'myFavouriteList']);
     Route::group(['prefix' => 'advertisement/chat'], function () {
@@ -96,8 +98,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get('user-detail', [UserController::class, 'userDetail']);
         Route::post('update-profile', [UserController::class, 'updateProfile']);
         Route::post('update-profile-picture', [UserController::class, 'updateProfilePicture']);
-        
-        //Address module 
+
+        //Address module
         Route::post('add-address', [UserController::class, 'addAddress']);
         Route::get('get-address', [UserController::class, 'getAddress']);
         Route::get('get-address-detail/{id}', [UserController::class, 'getAddressDetail']);
