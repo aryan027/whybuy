@@ -213,7 +213,7 @@ class WalletController extends Controller
                 }
                 $wallet = Wallet::where('user_id', auth()->id())->first();
                 $update = $rent->update([
-                    'status' => 2,
+                    'status' => 3,
                 ]);
                 if ($update) {
 
