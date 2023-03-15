@@ -33,14 +33,14 @@ class PackageController extends Controller
         if(empty($package)){
             return $this->ErrorResponse(200,'Package not found');
         }
-      $subs=   Subscription::create([
+      $subs= Subscription::create([
             'package_id'=> $request->package_id,
             'user_id'=>auth()->id(),
             'start'=>Carbon::now(),
             'end' =>Carbon::now()->addDays($package->durations),
             'no_of_ads'=> $package->no_of_ads,
             'price'=> $package->price,
-          'type'=>$package->type
+          'type'=>$package->type=='free'?0:1
             ]);
         if($subs){
             return $this->SuccessResponse(200,'subscription fetch successfully ..!',$subs);
