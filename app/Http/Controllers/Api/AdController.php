@@ -301,41 +301,4 @@ class AdController extends Controller
         $adsSeenHistory->ads_id = $advertisent_id;
         $adsSeenHistory->save();
     }
-
-       //aAd Rating Review
-    //    public function addRating(Request $request) {
-    //     try {
-    //         $user = auth()->user();
-    //         if(!empty($user)){
-    //             $validator = Validator::make($request->all(), [
-    //                 'advertisent_id'=>'required|integer|exists:advertisements,id',
-    //                 'rating'=>'required|integer',
-    //             ]);
-    //             if ($validator->fails()) {
-    //                 return $this->ErrorResponse(400,$validator->errors()->first());
-    //             }
-    //             $advertisent = Advertisement::where('id',$request->advertisent_id)->first();
-    //             if(!empty($advertisent)){
-    //                 $getRating = AdsRating::where(['user_id' => $user->id,'ads_id' => $advertisent->id])->first();
-    //                 if(!empty($getRating)){
-    //                     return $this->ErrorResponse(403, 'You have already give rating and review');
-    //                 }
-    //                 $adsRating = new AdsRating;
-    //                 $adsRating->user_id = $user->id;
-    //                 $adsRating->owner_id = $advertisent->user_id;
-    //                 $adsRating->ads_id = $advertisent->id;
-    //                 $adsRating->rating = $request->rating;
-    //                 $adsRating->review = $request->review;
-    //                 $adsRating->save();
-    //                 return $this->SuccessResponse(200, 'Rating review added successfully!', $adsRating);
-    //             }   
-    //             return $this->ErrorResponse(404, 'Advertisement not found');
-    //         }
-    //         return $this->ErrorResponse(500, 'Something Went Wrong');
-    //     } catch (Exception $exception) {
-    //         logger('error occurred in addresses fetching process');
-    //         logger(json_encode($exception));
-    //         return $this->ErrorResponse(500, 'Something Went Wrong');
-    //     }
-    // }
 }
