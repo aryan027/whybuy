@@ -86,7 +86,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('favourite/list',[FavouriteController::class,'myFavouriteList']);
     Route::group(['prefix' => 'advertisement/chat'], function () {
         Route::post('initiate', [ChatController::class, 'initiateChat']);
-        Route::post('/', [ChatController::class, 'sendMessage']);
+        Route::post('{cid}', [ChatController::class, 'sendMessage']);
         Route::post('{cid}/delete', [ChatController::class, 'deleteChat']);
         Route::post('delete/all', [ChatController::class, 'deleteAllChat']);
         Route::get('list/{aid}', [ChatController::class, 'adChatList']);
