@@ -15,6 +15,8 @@ use App\Models\Addresses;
 use App\Models\Countries;
 use App\Models\CMS;
 use App\Models\RentalAgreement;
+use App\Models\Notification;
+use App\Models\AdsSeenHistory;
 
 class Controller extends BaseController
 {
@@ -31,6 +33,8 @@ class Controller extends BaseController
         $this->cms = new CMS();
         $this->wallet = new Wallet();
         $this->rentalAgreement = new RentalAgreement();
+        $this->notification = new Notification();
+        $this->adsSeenHistory = new AdsSeenHistory();
     }
     public function SuccessResponse($code,$message,$data=null){
 
@@ -67,5 +71,25 @@ class Controller extends BaseController
             return $this->SuccessResponse(200,"No record found ..!",$data);
         }
         return $this->SuccessResponse(200,"data fetch successfully ..!",$data);
+    }
+
+    public function storeNotification($senderId,$receiverId,$rentItemId=Null,$type,$message)
+    {
+        $user = $this->user;
+        if($senderId){
+            $senderData = $user->where('id',$senderId)->first();
+        }
+        if($receiverId){
+            $receiverData = $user->where('id',$receiverId)->first();
+        }
+        if(!empty($senderData) && !empty($receiverData)){
+            $notification = $this->notification;
+            $notification->sender_id = $senderData->id;
+            $notification->receiver_id = $receiverData->id;
+            $notification->rent_item_id = $rentItemId;
+            $notification->type = $type;
+            $notification->message = $message;
+            $notification->save();
+        }
     }
 }
