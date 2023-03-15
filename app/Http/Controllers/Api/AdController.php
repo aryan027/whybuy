@@ -78,7 +78,7 @@ class AdController extends Controller
         try {
             $user = auth()->user();
             if(!empty($user)){
-                $ads = Advertisement::with('subCategory', 'category','getRetingReview','media')->where(['status' => true, 'approved' => true, 'published' => true])->where('user_id','!=',$user->id);
+                $ads = Advertisement::with('subCategory', 'category','media')->where(['status' => true, 'approved' => true, 'published' => true])->where('user_id','!=',$user->id);
                 $search = $request->search;
                 $category = $request->category;
                 $subCategory = $request->subCategory;
