@@ -32,16 +32,14 @@ class ChatController extends Controller
         }
     }
 
-    public function sendMessage(Request $request) {
+    public function sendMessage(Request $request, $cid) {
         $validator = Validator::make($request->all(), [
             'message' => 'nullable|string',
-            'media' => 'nullable|mimes:jpg,jpeg,png',
-            'cid' =>'required'
+            'media' => 'nullable|mimes:jpg,jpeg,png'
         ]);
         if ($validator->fails()) {
             return $this->ErrorResponse(401, 'Input validation failed');
         }
-        $cid= $request->cid;
         if (!$request['message'] && !$request->hasFile('media')) {
             return $this->ErrorResponse(401, 'Nothing to send');
         }
