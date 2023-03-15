@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\RentItemController;
 use App\Http\Controllers\Api\SubCategoryController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\CMSController;
+use App\Http\Controllers\Api\NotificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -74,16 +75,17 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
        Route::post('/timeslot',[RentItemController::class,'timeSlot']) ;
        Route::get('/item/list',[RentItemController::class,'myRentItemList']);
        Route::get('/item/rent-provide-list',[RentItemController::class,'provideRentItemList']);
-       Route::get('/item/agreement-form',[RentItemController::class,'agreementForm']);
-       Route::post('/item/owner-confirm-agreement',[RentItemController::class,'ownerConfirmAgreement']);
-       Route::post('/item/user-accept-agreement',[RentItemController::class,'userAcceptAgreement']);
-
+       Route::post('/item/agreement-form',[RentItemController::class,'agreementForm']);
+       Route::post('/item/owner-accept-agreement',[RentItemController::class,'ownerAcceptAgreement']);
+       Route::post('/item/user-confirm-agreement',[RentItemController::class,'userConfirmAgreement']);
+       
     });
     Route::get('packages',[PackageController::class,'package_listing']);
     Route::post('subscribe',[PackageController::class,'subscription']);
     Route::get('subscribe/list',[PackageController::class,'subscriptionList']);
     Route::post('add/favourite',[FavouriteController::class,'addToFavourite']);
     Route::get('favourite/list',[FavouriteController::class,'myFavouriteList']);
+    Route::post('favourite/remove',[FavouriteController::class,'myFavouriteRemove']);
     Route::group(['prefix' => 'advertisement/chat'], function () {
         Route::post('initiate', [ChatController::class, 'initiateChat']);
         Route::post('/', [ChatController::class, 'sendMessage']);
@@ -115,6 +117,13 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::group(['prefix' => 'cms'], function () {
         // CMS
         Route::get('get-cms', [CMSController::class, 'cms']);
+    });
+
+    // Notification Modules
+    Route::group(['prefix' => 'notification'], function () {
+        // CMS
+        Route::get('/', [NotificationController::class, 'index']);
+        Route::post('/read-notification', [NotificationController::class, 'readNotification']);
     });
 });
 
