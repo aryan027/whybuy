@@ -24,7 +24,7 @@ class RentItemController extends Controller
 //        $this->rentItem = Advertisement::where(['status' => 0])->latest()->get();
 //    }
     public function rentItem(Request $request){
-        // try {
+        try {
             $user = auth()->user();
             if(!empty($user)){
                 $validator= Validator::make($request->all(),[
@@ -72,8 +72,8 @@ class RentItemController extends Controller
                             'block' => 0
                         ]);
                         if($item){
-                            $type = 'send_for_confirm_agreement';
-                            $message = 'Confirmation agreement request for you';
+                            $type = 'send_for_accept_agreement';
+                            $message = 'Accept agreement request for you';
                             $senderId = $item->user_id;
                             $receiverId = $item->owner_id;
                             $this->storeNotification($senderId,$receiverId,$item->id,$type,$message);
@@ -85,11 +85,11 @@ class RentItemController extends Controller
                 return $this->ErrorResponse(404, 'Advertisement not found');
             }
             return $this->ErrorResponse(401, 'Unauthenticated');
-        // } catch (Exception $exception) {
-        //     logger('error occurred in user fetching process');
-        //     logger(json_encode($exception));
-        //     return $this->ErrorResponse(500, 'Something Went Wrong');
-        // }
+        } catch (Exception $exception) {
+            logger('error occurred in user fetching process');
+            logger(json_encode($exception));
+            return $this->ErrorResponse(500, 'Something Went Wrong');
+        }
     }
 
     //My Rent Item list
@@ -283,7 +283,7 @@ class RentItemController extends Controller
 
     // User Confirm Agreement
     public function userConfirmAgreement(Request $request){
-        // try {
+        try {
             $user = auth()->user();
             if(!empty($user)){
                 $validator= Validator::make($request->all(),[
@@ -304,10 +304,12 @@ class RentItemController extends Controller
                         $getRentalAgreement->save();
                         if($getRentalAgreement){
 
-                            $pdf = PDF::loadView('invoice.invoice-form',compact('rentItem'));
                             $fileName = Carbon::now()->format('YmdHis').'_'.$user->id.'.pdf';
+                            $pdf = PDF::loadView('invoice.invoice-form',compact('rentItem'));
                             $content = $pdf->download()->getOriginalContent();
-                            Storage::put('public/invoice/'.$fileName,$content);
+                            // Storage::put('public/invoice/'.$fileName,$content);
+                            $disk = 'public_local';
+                            $storagePath = Storage::disk($disk)->put('invoice/'.$fileName,$content);
                             $rentItem->invoice = 'invoice/'.$fileName;
 
                             $rentItem->status = 2; //Accept by user side
@@ -320,7 +322,7 @@ class RentItemController extends Controller
                                 $this->storeNotification($senderId,$receiverId,$rentItem->id,$type,$message);
                             }
                             $data = [
-                                'invoice' => asset('/storage/').'/'.$rentItem->invoice
+                                'invoice' => asset('/').$rentItem->invoice
                             ]; 
 
                             return  $this->SuccessResponse(200,'Rental agreement confirmed.',$data);  
@@ -332,11 +334,11 @@ class RentItemController extends Controller
                 return $this->ErrorResponse(401, 'Invalid rent form');
             }
             return $this->ErrorResponse(401, 'Unauthenticated');
-        // } catch (Exception $exception) {
-        //     logger('error occurred in user fetching process');
-        //     logger(json_encode($exception));
-        //     return $this->ErrorResponse(500, 'Something Went Wrong');
-        // }
+        } catch (Exception $exception) {
+            logger('error occurred in user fetching process');
+            logger(json_encode($exception));
+            return $this->ErrorResponse(500, 'Something Went Wrong');
+        }
     }
 
     // Invoice

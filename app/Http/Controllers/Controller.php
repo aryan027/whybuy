@@ -90,6 +90,68 @@ class Controller extends BaseController
             $notification->type = $type;
             $notification->message = $message;
             $notification->save();
+            $this->SendMobileNotification($rentItemId,$receiverData,$message);
         }
     }
+
+    public function storeAdvertisementNotification($senderId,$receiverId,$ads_id=Null,$type,$message)
+    {
+        $user = $this->user;
+        if($receiverId){
+            $receiverData = $user->where('id',$receiverId)->first();
+        }
+        if(!empty($receiverData)){
+            $notification = $this->notification;
+            $notification->sender_id = $senderId;
+            $notification->receiver_id = $receiverData->id;
+            $notification->ads_id = $ads_id;
+            $notification->type = $type;
+            $notification->message = $message;
+            $notification->save();
+            $this->SendMobileNotification($ads_id,$receiverData,$message);
+        }
+    }
+
+    public function SendMobileNotification($rentItemId=NULL,$receiverData,$message=NULL)
+    {
+        try {
+            $device_token = [$receiverData->device_token];
+            if($device_token != ''){
+                $SERVER_API_KEY = config('app.SERVER_API_KEY');
+                $responseData = [
+                    'rent_item_id' => $rentItemId,
+                ];
+                $data = [
+                    "registration_ids" => $device_token,
+                    "notification" => [
+                        "priority" => "high",
+                        "title" => config('app.name'),
+                        "body" => $message,  
+                    ],
+                    'data' => $responseData,
+                    "content_available" => true,
+                ];
+        
+                $dataString = json_encode($data);
+                $headers = [
+                    'Authorization: key='.$SERVER_API_KEY,
+                    'Content-Type: application/json',
+                ];
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
+                $response = curl_exec($ch);
+                curl_close ( $ch );
+            }
+
+        } catch (Exception $e) {
+			
+        }
+		
+    }
+
 }

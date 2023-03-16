@@ -11,6 +11,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Validator;
 
 class SubCategoryController extends Controller
 {
@@ -41,13 +42,37 @@ class SubCategoryController extends Controller
      * @param $cid
      * @return \Illuminate\Contracts\Foundation\Application|ResponseFactory|Application|JsonResponse|Response
      */
-    public function subCategoriesById($cid) {
-        try {
-            $subCategories = $this->subCategories->where('category_id', $cid);
+    public function subCategoriesById(Request $request) {
+        // try {
+        //     $subCategories = $this->subCategories->where('category_id', $cid);
 
-            return $this->SuccessResponse(200, 'Sub Categories Fetched', $subCategories);
+        //     return $this->SuccessResponse(200, 'Sub Categories Fetched', $subCategories);
+        // } catch (Exception $exception) {
+        //     logger('error occurred in sub categories find by id process');
+        //     logger(json_encode($exception));
+        //     return $this->ErrorResponse(500, 'Something Went Wrong');
+        // }
+
+        try {
+            $user = auth()->user();
+            if(!empty($user)){
+                $validator= Validator::make($request->all(),[
+                    'category_id'=>'required|integer|exists:categories,id',
+                ]);
+                if($validator->fails()){
+                    return $this->ErrorResponse(400,$validator->errors()->first());
+                }
+                $subCategory = SubCategory::with('category')->where('category_id', $request->category_id)->first();
+                if(!empty($subCategory)){
+                    $subCategory['image']= $subCategory->getFirstMediaUrl('category','thumb') ;
+                    unset($subCategory['media']);
+                    return $this->SuccessResponse(200, 'Category get successfully',$subCategory);
+                }
+                return $this->ErrorResponse(404, 'Category not found');
+            }
+            return $this->ErrorResponse(500, 'Something Went Wrong');
         } catch (Exception $exception) {
-            logger('error occurred in sub categories find by id process');
+            logger('error occurred in addresses fetching process');
             logger(json_encode($exception));
             return $this->ErrorResponse(500, 'Something Went Wrong');
         }
@@ -57,16 +82,40 @@ class SubCategoryController extends Controller
      * @param $sid
      * @return \Illuminate\Contracts\Foundation\Application|ResponseFactory|Application|JsonResponse|Response
      */
-    public function subCategoryInfo($sid) {
-        try {
-            $subCategory = $this->subCategories->where('id', $sid)->first();
+    public function subCategoryInfo(Request $request) {
+        // try {
+        //     $subCategory = $this->subCategories->where('id', $sid)->first();
 
-            if (!$subCategory) {
-                return $this->ErrorResponse(404, 'Sub Category not found');
+        //     if (!$subCategory) {
+        //         return $this->ErrorResponse(404, 'Sub Category not found');
+        //     }
+        //     return $this->SuccessResponse(200, 'Sub Categories Fetched', $subCategory);
+        // } catch (Exception $exception) {
+        //     logger('error occurred in sub categories find by id process');
+        //     logger(json_encode($exception));
+        //     return $this->ErrorResponse(500, 'Something Went Wrong');
+        // }
+
+        try {
+            $user = auth()->user();
+            if(!empty($user)){
+                $validator= Validator::make($request->all(),[
+                    'sub_category_id'=>'required|integer|exists:sub_categories,id',
+                ]);
+                if($validator->fails()){
+                    return $this->ErrorResponse(400,$validator->errors()->first());
+                }
+                $subCategory = SubCategory::where('id', $request->sub_category_id)->first();
+                if(!empty($subCategory)){
+                    $subCategory['image']= $subCategory->getFirstMediaUrl('category','thumb') ;
+                    unset($subCategory['media']);
+                    return $this->SuccessResponse(200, 'Sub category get successfully',$subCategory);
+                }
+                return $this->ErrorResponse(404, 'Sub category not found');
             }
-            return $this->SuccessResponse(200, 'Sub Categories Fetched', $subCategory);
+            return $this->ErrorResponse(500, 'Something Went Wrong');
         } catch (Exception $exception) {
-            logger('error occurred in sub categories find by id process');
+            logger('error occurred in addresses fetching process');
             logger(json_encode($exception));
             return $this->ErrorResponse(500, 'Something Went Wrong');
         }

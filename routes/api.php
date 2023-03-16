@@ -34,14 +34,16 @@ Route::post('register',[AuthController::class,'register']);
 Route::post('verify',[AuthController::class,'verify_otp']);
 Route::post('login',[AuthController::class,'login']);
 Route::get('authentication',[AuthController::class,'authentication'])->name('authentication');
-Route::group(['prefix' => 'category'], function () {
-    Route::get('/', [CategoryController::class, 'listing']);
-    Route::get('/{cid}', [CategoryController::class, 'categoryInformation']);
-});
-Route::group(['prefix' => 'sub-category'], function () {
-    Route::get('/', [SubCategoryController::class, 'listing']);
-    Route::get('/{cid}', [SubCategoryController::class, 'subCategoriesById']);
-    Route::get('/information/{sid}', [SubCategoryController::class, 'subCategoryInfo']);
+Route::group(['middleware' => 'auth:sanctum'], function () {
+    Route::group(['prefix' => 'category'], function () {
+        Route::get('/', [CategoryController::class, 'listing']);
+        Route::get('category-detail', [CategoryController::class, 'categoryInformation']);
+    });
+    Route::group(['prefix' => 'sub-category'], function () {
+        Route::get('/', [SubCategoryController::class, 'listing']);
+        Route::get('/category', [SubCategoryController::class, 'subCategoriesById']);
+        Route::get('/information/detail', [SubCategoryController::class, 'subCategoryInfo']);
+    });
 });
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
@@ -101,6 +103,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get('user-detail', [UserController::class, 'userDetail']);
         Route::post('update-profile', [UserController::class, 'updateProfile']);
         Route::post('update-profile-picture', [UserController::class, 'updateProfilePicture']);
+        Route::post('update-device-token', [UserController::class, 'updateDeviceToken']);
 
         //Address module
         Route::post('add-address', [UserController::class, 'addAddress']);
