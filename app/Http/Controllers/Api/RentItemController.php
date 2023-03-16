@@ -13,8 +13,9 @@ use Exception;
 use DateTime;
 use Carbon\CarbonInterval;
 use Carbon\CarbonPeriod;
-
 use DatePeriod;
+use Storage;
+use PDF;
 
 class RentItemController extends Controller
 {
@@ -282,7 +283,7 @@ class RentItemController extends Controller
 
     // User Confirm Agreement
     public function userConfirmAgreement(Request $request){
-        try {
+        // try {
             $user = auth()->user();
             if(!empty($user)){
                 $validator= Validator::make($request->all(),[
@@ -302,6 +303,13 @@ class RentItemController extends Controller
                         $getRentalAgreement->user_id = $user->id; 
                         $getRentalAgreement->save();
                         if($getRentalAgreement){
+
+                            $pdf = PDF::loadView('invoice.invoice-form',compact('rentItem'));
+                            $fileName = Carbon::now()->format('YmdHis').'_'.$user->id.'.pdf';
+                            $content = $pdf->download()->getOriginalContent();
+                            Storage::put('public/invoice/'.$fileName,$content);
+                            $rentItem->invoice = 'invoice/'.$fileName;
+
                             $rentItem->status = 2; //Accept by user side
                             $rentItem->save();
                             if($rentItem){
@@ -311,10 +319,44 @@ class RentItemController extends Controller
                                 $receiverId = $rentItem->owner_id;
                                 $this->storeNotification($senderId,$receiverId,$rentItem->id,$type,$message);
                             }
+                            $data = [
+                                'invoice' => asset('/storage/').'/'.$rentItem->invoice
+                            ]; 
+
+                            return  $this->SuccessResponse(200,'Rental agreement confirmed.',$data);  
                         }
-                        return  $this->SuccessResponse(200,'Rental agreement confirmed.');  
+                        return $this->ErrorResponse(500, 'Something went to wrong!');
                     }
                     return $this->ErrorResponse(404, 'Owner can not acccepted rent agreement');
+                }
+                return $this->ErrorResponse(401, 'Invalid rent form');
+            }
+            return $this->ErrorResponse(401, 'Unauthenticated');
+        // } catch (Exception $exception) {
+        //     logger('error occurred in user fetching process');
+        //     logger(json_encode($exception));
+        //     return $this->ErrorResponse(500, 'Something Went Wrong');
+        // }
+    }
+
+    // Invoice
+    public function invoice(Request $request){
+        try {
+            $user = auth()->user();
+            if(!empty($user)){
+                $validator= Validator::make($request->all(),[
+                    'rent_item_id'=>'required|integer|exists:rent_items,id',
+                ]);
+                if($validator->fails()){
+                    return $this->ErrorResponse(400,$validator->errors()->first());
+                }
+                $rentItem = RentItem::where(['id' => $request->rent_item_id,'user_id' => $user->id])->first();
+                if(!empty($rentItem)){
+                    $data = [
+                        'invoice' => asset('/storage/').'/'.$rentItem->invoice
+                    ]; 
+
+                    return  $this->SuccessResponse(200,'Invoice get successfully.',$data);    
                 }
                 return $this->ErrorResponse(401, 'Invalid rent form');
             }
@@ -325,5 +367,6 @@ class RentItemController extends Controller
             return $this->ErrorResponse(500, 'Something Went Wrong');
         }
     }
+    
 
 }

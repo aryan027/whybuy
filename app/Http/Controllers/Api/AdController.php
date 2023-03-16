@@ -59,6 +59,7 @@ class AdController extends Controller
         }
         $request['user_id'] = auth()->id();
         $request['status'] = 1;
+        $request['published'] = 1;
         $request['ad_id'] = IdGenerator::generate(['table' => 'advertisements','field'=>'ad_id', 'length' => 16, 'prefix' => date('Y').'-'.auth()->id().'-']);
         $create = Advertisement::create($request->all());
         if (!$create) {

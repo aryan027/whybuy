@@ -78,6 +78,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
        Route::post('/item/agreement-form',[RentItemController::class,'agreementForm']);
        Route::post('/item/owner-accept-agreement',[RentItemController::class,'ownerAcceptAgreement']);
        Route::post('/item/user-confirm-agreement',[RentItemController::class,'userConfirmAgreement']);
+       Route::post('/item/invoice',[RentItemController::class,'invoice']);
        
     });
     Route::get('packages',[PackageController::class,'package_listing']);
