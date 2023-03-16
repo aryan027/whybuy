@@ -10,7 +10,7 @@ use App\Http\Controllers\Admin\AdvertisementController;
 use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\CMSController;
 use App\Http\Controllers\Admin\UserController;
-
+use App\Http\Controllers\AgreementController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -26,6 +26,8 @@ use App\Http\Controllers\Admin\UserController;
 //     // return view('welcome');
 //     return view('auth.login');
 // });
+Route::get('/agreement-form/{rent_item_id}/{user_id}', [AgreementController::class, 'agreementForm']);
+
 Route::get('/', [App\Http\Controllers\HomeController::class, 'login']);
 Route::get('/admin', [App\Http\Controllers\HomeController::class, 'login']);
 
