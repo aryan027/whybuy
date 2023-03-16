@@ -13,20 +13,12 @@ return new class extends Migration
     {
         Schema::create('rental_agreement', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->on('users')->references('id')->onUpdate('cascade')->onDelete('cascade');
-            $table->tinyInteger('user_type')->default(1)->comment('1=user,2=owner');
             $table->unsignedBigInteger('rent_item_id');
             $table->foreign('rent_item_id')->on('rent_items')->references('id')->onUpdate('cascade')->onDelete('cascade');
-            $table->string('name');
-            $table->string('phone');
-            $table->text('address');
-            $table->date('start_date');
-            $table->date('end_date');
-            $table->time('start_time')->nullable();
-            $table->time('end_time')->nullable();
-            $table->text('purpose')->nullable();
-            $table->text('shelter')->nullable();
+            $table->tinyInteger('is_accept')->default(0)->comment("0=Not aceepted, 1=Accepted");
+            $table->Integer('owner_id')->nullable();
+            $table->tinyInteger('is_confirm')->default(0)->comment("0=Not confirmed, 1=confirmed");
+            $table->Integer('user_id')->nullable();
             $table->timestamps();
         });
     }

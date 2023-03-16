@@ -13,8 +13,9 @@ use Exception;
 use DateTime;
 use Carbon\CarbonInterval;
 use Carbon\CarbonPeriod;
-
 use DatePeriod;
+use Storage;
+use PDF;
 
 class RentItemController extends Controller
 {
@@ -23,15 +24,14 @@ class RentItemController extends Controller
 //        $this->rentItem = Advertisement::where(['status' => 0])->latest()->get();
 //    }
     public function rentItem(Request $request){
-        try {
+        // try {
             $user = auth()->user();
             if(!empty($user)){
                 $validator= Validator::make($request->all(),[
                     'ads_id'=>'required|integer|exists:advertisements,id',
                     'rent_type'=>'required|in:day',
-                    'start'=>'required|date_format:Y-m-d|after_or_equal:today',
-                    'end' =>'required|date_format:Y-m-d|after_or_equal:start',
-                    // 'price'=>'required',
+                    'start'=>'required|date_format:Y-m-d H:i|after_or_equal:today',
+                    'end' =>'required|date_format:Y-m-d H:i|after_or_equal:start',
                     'description'=>'nullable',
                     'purpose'=>'nullable'
                 ]);
@@ -39,34 +39,24 @@ class RentItemController extends Controller
                     return $this->ErrorResponse(400,$validator->errors()->first());
                 }
 
-                // if($request->rent_type == 'hour'){
-                //     $validator= Validator::make($request->all(),[
-                //         'start_time'=>'required|date_format:H:i',
-                //         'end_time' =>'required|date_format:H:i|after:start_time',
-                //     ]);
-                //     if($validator->fails()){
-                //         return $this->ErrorResponse(400,$validator->errors()->first());
-                //     }
-                // }
-
                 $advertisement = Advertisement::where('id', $request->ads_id)->first();
                 if(!empty($advertisement)){
                     $wallet = Wallet::where('user_id',$user->id)->first();
                     if(!empty($wallet) && $wallet->balance >= $advertisement->deposit_amount){
-                        $startDate = Carbon::createFromFormat('Y-m-d', $request->start);
-                        $endDate = Carbon::createFromFormat('Y-m-d', $request->end);
-                        $dateRange = CarbonPeriod::create($startDate, $endDate);
-                        $dates = array_map(fn ($date) => $date->format('Y-m-d'), iterator_to_array($dateRange));
+                        // $startDate = Carbon::createFromFormat('Y-m-d', $request->start);
+                        // $endDate = Carbon::createFromFormat('Y-m-d', $request->end);
+                        // $dateRange = CarbonPeriod::create($startDate, $endDate);
+                        // $dates = array_map(fn ($date) => $date->format('Y-m-d'), iterator_to_array($dateRange));
                     
-                        $time = [];
-                        if($request->rent_type == 'day'){
-                            foreach($dates as $date){
-                                $rentItem = RentItem::whereDate('start', $date)->where(['ads_id' => $request->ads_id,'owner_id' => $advertisement->user_id])->first();
-                                if(!empty($rentItem)){
-                                    return $this->ErrorResponse(400, 'This item already booked on this date '.$date);
-                                }
-                            }
-                        }
+                        // $time = [];
+                        // if($request->rent_type == 'day'){
+                        //     foreach($dates as $date){
+                        //         $rentItem = RentItem::whereDate('start', $date)->where(['ads_id' => $request->ads_id,'owner_id' => $advertisement->user_id])->first();
+                        //         if(!empty($rentItem)){
+                        //             return $this->ErrorResponse(400, 'This item already booked on this date '.$date);
+                        //         }
+                        //     }
+                        // }
                         $price = $advertisement->daily_rent;
                         $item= RentItem::create([
                             'ads_id'=>$request->ads_id,
@@ -78,8 +68,16 @@ class RentItemController extends Controller
                             'price'=> $price,
                             'deposite_amount' => $advertisement->deposit_amount,
                             'description'=>$request->description,
-                            'purpose'=>$request->purpose
+                            'purpose'=>$request->purpose,
+                            'block' => 0
                         ]);
+                        if($item){
+                            $type = 'send_for_confirm_agreement';
+                            $message = 'Confirmation agreement request for you';
+                            $senderId = $item->user_id;
+                            $receiverId = $item->owner_id;
+                            $this->storeNotification($senderId,$receiverId,$item->id,$type,$message);
+                        }
                         return $this->SuccessResponse(200,'Rent Request send successfully',$item);
                     }
                     return $this->ErrorResponse(400, 'Please first add wallet amound base on deposit amount');
@@ -87,11 +85,11 @@ class RentItemController extends Controller
                 return $this->ErrorResponse(404, 'Advertisement not found');
             }
             return $this->ErrorResponse(401, 'Unauthenticated');
-        } catch (Exception $exception) {
-            logger('error occurred in user fetching process');
-            logger(json_encode($exception));
-            return $this->ErrorResponse(500, 'Something Went Wrong');
-        }
+        // } catch (Exception $exception) {
+        //     logger('error occurred in user fetching process');
+        //     logger(json_encode($exception));
+        //     return $this->ErrorResponse(500, 'Something Went Wrong');
+        // }
     }
 
     //My Rent Item list
@@ -157,37 +155,39 @@ class RentItemController extends Controller
             $user = auth()->user();
             if(!empty($user)){
                 $validator= Validator::make($request->all(),[
-                    'owner_id'=>'required|integer|exists:users,id',
                     'ads_id'=>'required|integer|exists:advertisements,id',
                     'rent_type'=>'required|in:day',
-                    'start'=>'required|date_format:Y-m-d|after_or_equal:today',
-                    'end' =>'required|date_format:Y-m-d|after_or_equal:start',
                 ]);
                 if($validator->fails()){
                     return $this->ErrorResponse(400,$validator->errors()->first());
                 }
-
-                $startDate = Carbon::createFromFormat('Y-m-d', $request->start);
-                $endDate = Carbon::createFromFormat('Y-m-d', $request->end);
-
-                $dateRange = CarbonPeriod::create($startDate, $endDate);
-
-                $dates = array_map(fn ($date) => $date->format('Y-m-d'), iterator_to_array($dateRange));
-               
-                $time = [];
-                if($request->rent_type == 'day'){
-                    foreach($dates as $date){
-                        $rentItem = RentItem::whereDate('start', $date)->where(['ads_id' => $request->ads_id,'owner_id' => $request->owner_id])->first();
-                        if(!empty($rentItem)){
-                            $time[$date]['status'] = 'Not availiable';
-                        } else {
-                            $time[$date]['status'] = 'availiable';
+                $advertisement = Advertisement::where('id',$request->ads_id)->first();
+                if(!empty($advertisement)){
+                    // $startDate = Carbon::createFromFormat('Y-m-d', $request->start);
+                    // $endDate = Carbon::createFromFormat('Y-m-d', $request->end);
+                    // $dateRange = CarbonPeriod::create($startDate, $endDate);
+                    // $dates = array_map(fn ($date) => $date->format('Y-m-d'), iterator_to_array($dateRange));
+                    $time = [];
+                    if($request->rent_type == 'day'){
+                        $startDate = Carbon::now()->format('Y-m-d');
+                            $endDate = Carbon::now()->addMonths(3)->format('Y-m-d');
+                            $rentItem = RentItem::whereBetween(\DB::raw("(DATE_FORMAT(start,'%Y-%m-%d'))"), [$startDate, $endDate])->where(['ads_id' => $request->ads_id,'owner_id' => $advertisement->user_id])->get();
+                            $storeDate = [];
+                            foreach($rentItem as $key => $value){
+                                $storeDate[$key][] = Carbon::parse($value->start)->format('Y-m-d').' | '.Carbon::parse($value->end)->format('Y-m-d');
+                            }
+                            $datesData = [];
+                            foreach($storeDate as $date){
+                                $storeDate = explode('|',$date[0]);
+                                $dateRange = CarbonPeriod::create($storeDate[0], $storeDate[1]);
+                                $timeData = array_map(fn ($date) => $date->format('Y-m-d'), iterator_to_array($dateRange));
+                                $time = array_merge($time,$timeData);
+                            }
+                            return $this->SuccessResponse(200, 'Time slot get successfully',$time);
                         }
-                    }
-                    return $this->SuccessResponse(200, 'Time slot get successfully',$time);
+                    return $this->ErrorResponse(400, 'The rent type field is required.');
                 }
-                return $this->ErrorResponse(400, 'The rent type field is required.');
-
+                return $this->ErrorResponse(404, 'Advertisement not found');
             }
             return $this->ErrorResponse(401, 'Unauthenticated');
         } catch (Exception $exception) {
@@ -202,10 +202,26 @@ class RentItemController extends Controller
         try {
             $user = auth()->user();
             if(!empty($user)){
-                $str='<html><body>';
-                $str.='<p>Name</p><p>Phone</p><p>Address</p><p>Date Start</p><p>Date End</p><p>Time</p><p>Purpose</p>';
-                $str.='</body></html>';
-                return  $this->SuccessResponse(200,'Data fetch successfully ..',$str);  
+                $validator= Validator::make($request->all(),[
+                    'rent_id'=>'required|integer|exists:rent_items,id',
+                ]);
+                if($validator->fails()){
+                    return $this->ErrorResponse(400,$validator->errors()->first());
+                }
+                $rentitem= RentItem::where('id',$request->rent_id)->first();
+                
+                if(!empty($rentitem)){
+                    $data = [
+                        'rent_item_id' => $rentitem->id,
+                        'url' => url('/').'/agreement-form/'.$rentitem->id.'/'.$user->id,
+                    ];
+                    
+                    return $this->SuccessResponse(200, 'Rent detail Fetched Successfully', $data);
+                }
+                // $str='<html><body>';
+                // $str.='<p>Name</p><p>Phone</p><p>Address</p><p>Date Start</p><p>Date End</p><p>Time</p><p>Purpose</p>';
+                // $str.='</body></html>';
+                // return  $this->SuccessResponse(200,'Data fetch successfully ..',$str);  
             }
             return $this->ErrorResponse(401, 'Unauthenticated');
         } catch (Exception $exception) {
@@ -216,18 +232,13 @@ class RentItemController extends Controller
         
     }
 
-    // Owner Confirm Agreement
-    public function ownerConfirmAgreement(Request $request){
+    // Owner Accept Agreement
+    public function ownerAcceptAgreement(Request $request){
         try {
             $user = auth()->user();
             if(!empty($user)){
                 $validator= Validator::make($request->all(),[
                     'rent_item_id'=>'required|integer|exists:rent_items,id',
-                    'name'=>'required|string',
-                    'phone'=>'required|numeric|digits:10',
-                    'address'=>'required',
-                    'start_date'=>'required|date_format:Y-m-d|after_or_equal:today',
-                    'end_date' =>'required|date_format:Y-m-d|after_or_equal:start',
                 ]);
                 if($validator->fails()){
                     return $this->ErrorResponse(400,$validator->errors()->first());
@@ -237,53 +248,46 @@ class RentItemController extends Controller
                     if($rentItem->status == 3){
                         return $this->ErrorResponse(400, 'your rent agreement is already canceled');
                     }
-                    $getRentalAgreement = $this->rentalAgreement->where(['rent_item_id' => $rentItem->id,'user_id' => $user->id,'user_type' => $this->rentalAgreement::IS_OWNER_TYPE])->first();
-                    if(!empty($getRentalAgreement)){
-                        return $this->ErrorResponse(409, 'You are already confirmed rent agreement');
-                    }
+                    // $getRentalAgreement = $this->rentalAgreement->where(['rent_item_id' => $rentItem->id])->first();
+                    // if(!empty($getRentalAgreement)){
+                    //     return $this->ErrorResponse(409, 'You are already confirmed rent agreement');
+                    // }
                     $rentalAgreement = $this->rentalAgreement;
-                    $rentalAgreement->user_id = $user->id; //Owner id is users table
-                    $rentalAgreement->user_type = 2;
                     $rentalAgreement->rent_item_id = $rentItem->id;
-                    $rentalAgreement->name = $request->name;
-                    $rentalAgreement->phone = $request->phone;
-                    $rentalAgreement->address = $request->address;
-                    $rentalAgreement->start_date = $request->start_date;
-                    $rentalAgreement->end_date = $request->end_date;
-                    $rentalAgreement->start_time = $request->start_time;
-                    $rentalAgreement->end_time = $request->end_time;
-                    $rentalAgreement->purpose = $request->purpose;
-                    $rentalAgreement->shelter = $request->shelter; 
+                    $rentalAgreement->is_accept = 1; 
+                    $rentalAgreement->owner_id = $user->id; 
                     // $jsonobj = '{"east_shelter_house":true,"west_shelter_house":false,"jayeee":false,"east_shelter_house_kitchen":false,"crown_pavilion":false,"water":false}';
                     $rentalAgreement->save();
                     if($rentalAgreement){
-                        $rentItem->status = 1; //Confirm by owner side
+                        $rentItem->status = 1; //Accepted by owner side
                         $rentItem->save();
+                        if($rentItem){
+                            $type = 'accepted_agreement';
+                            $message = 'Accept agreement from owner side. please accept agreement';
+                            $senderId = $rentItem->owner_id;
+                            $receiverId = $rentItem->user_id;
+                            $this->storeNotification($senderId,$receiverId,$rentItem->id,$type,$message);
+                        }
                     }
-                    return  $this->SuccessResponse(200,'Rental agreement confirmed.');  
+                    return  $this->SuccessResponse(200,'Rental agreement accepted.');  
                 }
-                return $this->ErrorResponse(401, 'Invalid rent form');
+               return $this->ErrorResponse(401, 'Invalid rent form');
             }
             return $this->ErrorResponse(401, 'Unauthenticated');
         } catch (Exception $exception) {
             logger('error occurred in user fetching process');
             logger(json_encode($exception));
-            return $this->ErrorResponse(500, 'Something Went Wrong');
+            return $this ->ErrorResponse(500, 'Something Went Wrong');
         }
     }
 
-    // User Accept Agreement
-    public function userAcceptAgreement(Request $request){
-        try {
+    // User Confirm Agreement
+    public function userConfirmAgreement(Request $request){
+        // try {
             $user = auth()->user();
             if(!empty($user)){
                 $validator= Validator::make($request->all(),[
                     'rent_item_id'=>'required|integer|exists:rent_items,id',
-                    'name'=>'required|string',
-                    'phone'=>'required|numeric|digits:10',
-                    'address'=>'required',
-                    'start_date'=>'required|date_format:Y-m-d|after_or_equal:today',
-                    'end_date' =>'required|date_format:Y-m-d|after_or_equal:start',
                 ]);
                 if($validator->fails()){
                     return $this->ErrorResponse(400,$validator->errors()->first());
@@ -293,30 +297,66 @@ class RentItemController extends Controller
                     if($rentItem->status == 3){
                         return $this->ErrorResponse(400, 'your rent agreement is already canceled');
                     }
-                    $getRentalAgreement = $this->rentalAgreement->where(['rent_item_id' => $rentItem->id,'user_id' => $user->id,'user_type' => $this->rentalAgreement::IS_USER_TYPE])->first();
+                    $getRentalAgreement = $this->rentalAgreement->where(['rent_item_id' => $rentItem->id])->first();
                     if(!empty($getRentalAgreement)){
-                        return $this->ErrorResponse(409, 'You are already acccepted rent agreement');
+                        $getRentalAgreement->is_confirm = 1; 
+                        $getRentalAgreement->user_id = $user->id; 
+                        $getRentalAgreement->save();
+                        if($getRentalAgreement){
+
+                            $pdf = PDF::loadView('invoice.invoice-form',compact('rentItem'));
+                            $fileName = Carbon::now()->format('YmdHis').'_'.$user->id.'.pdf';
+                            $content = $pdf->download()->getOriginalContent();
+                            Storage::put('public/invoice/'.$fileName,$content);
+                            $rentItem->invoice = 'invoice/'.$fileName;
+
+                            $rentItem->status = 2; //Accept by user side
+                            $rentItem->save();
+                            if($rentItem){
+                                $type = 'confirm_agreement';
+                                $message = 'Agreement confirmed';
+                                $senderId = $rentItem->user_id;
+                                $receiverId = $rentItem->owner_id;
+                                $this->storeNotification($senderId,$receiverId,$rentItem->id,$type,$message);
+                            }
+                            $data = [
+                                'invoice' => asset('/storage/').'/'.$rentItem->invoice
+                            ]; 
+
+                            return  $this->SuccessResponse(200,'Rental agreement confirmed.',$data);  
+                        }
+                        return $this->ErrorResponse(500, 'Something went to wrong!');
                     }
-                    $rentalAgreement = $this->rentalAgreement;
-                    $rentalAgreement->user_id = $user->id; //User id is users table
-                    $rentalAgreement->user_type = 1;
-                    $rentalAgreement->rent_item_id = $rentItem->id;
-                    $rentalAgreement->name = $request->name;
-                    $rentalAgreement->phone = $request->phone;
-                    $rentalAgreement->address = $request->address;
-                    $rentalAgreement->start_date = $request->start_date;
-                    $rentalAgreement->end_date = $request->end_date;
-                    $rentalAgreement->start_time = $request->start_time;
-                    $rentalAgreement->end_time = $request->end_time;
-                    $rentalAgreement->purpose = $request->purpose;
-                    $rentalAgreement->shelter = $request->shelter; 
-                    // $jsonobj = '{"east_shelter_house":true,"west_shelter_house":false,"jayeee":false,"east_shelter_house_kitchen":false,"crown_pavilion":false,"water":false}';
-                    $rentalAgreement->save();
-                    if($rentalAgreement){
-                        $rentItem->status = 2; //Accept by user side
-                        $rentItem->save();
-                    }
-                    return  $this->SuccessResponse(200,'Rental agreement accepted.');  
+                    return $this->ErrorResponse(404, 'Owner can not acccepted rent agreement');
+                }
+                return $this->ErrorResponse(401, 'Invalid rent form');
+            }
+            return $this->ErrorResponse(401, 'Unauthenticated');
+        // } catch (Exception $exception) {
+        //     logger('error occurred in user fetching process');
+        //     logger(json_encode($exception));
+        //     return $this->ErrorResponse(500, 'Something Went Wrong');
+        // }
+    }
+
+    // Invoice
+    public function invoice(Request $request){
+        try {
+            $user = auth()->user();
+            if(!empty($user)){
+                $validator= Validator::make($request->all(),[
+                    'rent_item_id'=>'required|integer|exists:rent_items,id',
+                ]);
+                if($validator->fails()){
+                    return $this->ErrorResponse(400,$validator->errors()->first());
+                }
+                $rentItem = RentItem::where(['id' => $request->rent_item_id,'user_id' => $user->id])->first();
+                if(!empty($rentItem)){
+                    $data = [
+                        'invoice' => asset('/storage/').'/'.$rentItem->invoice
+                    ]; 
+
+                    return  $this->SuccessResponse(200,'Invoice get successfully.',$data);    
                 }
                 return $this->ErrorResponse(401, 'Invalid rent form');
             }
@@ -327,5 +367,6 @@ class RentItemController extends Controller
             return $this->ErrorResponse(500, 'Something Went Wrong');
         }
     }
+    
 
 }

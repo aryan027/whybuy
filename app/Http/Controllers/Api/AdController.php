@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Advertisement;
 use App\Models\Category;
 use App\Models\SubCategory;
+use App\Models\AdsSeenHistory;
 use App\Models\User;
+use App\Models\FavouriteAds;
 use Haruncpi\LaravelIdGenerator\IdGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -46,15 +48,18 @@ class AdController extends Controller
             'address' => 'required|string',
             'latitude' => 'required|string',
             'longitude' => 'required|string',
+            'purpose' => 'required',
             // 'image' => 'required|mimes:jpg,jpeg,png'
             'image' => 'required',
             'image.*' => 'image|mimes:jpeg,png,jpg'
         ]);
         if ($validator->fails()) {
-            return $this->ErrorResponse(403, 'Input Validation Failed', $validator->errors());
+            return $this->ErrorResponse(400,$validator->errors()->first());
+            // return $this->ErrorResponse(403, 'Input Validation Failed', $validator->errors());
         }
         $request['user_id'] = auth()->id();
         $request['status'] = 1;
+        $request['published'] = 1;
         $request['ad_id'] = IdGenerator::generate(['table' => 'advertisements','field'=>'ad_id', 'length' => 16, 'prefix' => date('Y').'-'.auth()->id().'-']);
         $create = Advertisement::create($request->all());
         if (!$create) {
@@ -74,7 +79,7 @@ class AdController extends Controller
         try {
             $user = auth()->user();
             if(!empty($user)){
-                $ads = Advertisement::with('subCategory', 'category')->where(['status' => true, 'approved' => true, 'published' => true])->where('user_id','!=',$user->id);
+                $ads = Advertisement::with('subCategory', 'category','media')->where(['status' => true, 'approved' => true, 'published' => true])->where('user_id','!=',$user->id);
                 $search = $request->search;
                 $category = $request->category;
                 $subCategory = $request->subCategory;
@@ -109,11 +114,15 @@ class AdController extends Controller
                     ->orderBy('distance', 'asc');
                 }
 
-                $ads = $ads->latest()->get();
-                $ads = collect($ads)->map(function($q) {
-                    $q->media = ($q->getFirstMediaUrl('ads'));
-                    return $q;
+                $ads = $ads->latest()->paginate(20);
+                $ads->map(function($q){
+                    $q->seen_count = (count($q->getSeenHistory) > 0) ? $q->getSeenHistory->count() : 0;
+                    unset($q->getSeenHistory);
                 });
+                // $ads = collect($ads)->map(function($q) {
+                //     $q->media = ($q->getFirstMediaUrl('ads'));
+                //     return $q;
+                // });
                 return $this->SuccessResponse(200, 'Advertisement Fetched Successfully', $ads);
             }
             return $this->ErrorResponse(500, 'Something Went Wrong');
@@ -127,7 +136,9 @@ class AdController extends Controller
     public function myAds() {
         $ads = Advertisement::with('subCategory', 'category')->where(['user_id' => auth()->id(),'status' => true, 'approved' => true, 'published' => true])->latest()->get();
         $ads = collect($ads)->map(function($q) {
+            $q->seen_count = (count($q->getSeenHistory) > 0) ? $q->getSeenHistory->count() : 0;
             $q->media = ($q->getFirstMediaUrl('ads'));
+            unset($q->getSeenHistory);
             return $q;
         });
         return $this->SuccessResponse(200, 'Advertisement Fetched Successfully', $ads);
@@ -180,7 +191,17 @@ class AdController extends Controller
 
                 $advertisement = Advertisement::with('subCategory', 'category','user')->where('id',$request->advertisent_id)->first();
                 if(!empty($advertisement)){
+                    $favotiteAds = FavouriteAds::where(['user_id' => $user->id,'ads_id' => $advertisement->id])->first();
+                    $advertisement->seen_count = (count($advertisement->getSeenHistory) > 0) ? $advertisement->getSeenHistory->count() : 0;
+                    $advertisement->favorite = $favotiteAds;
                     $advertisement->media = $advertisement->getFirstMediaUrl('ads');
+
+                    $adsSeenHistory = AdsSeenHistory::where(['user_id' => $user->id,'ads_id' => $advertisement->id])->first();
+                    if(empty($adsSeenHistory)){
+                        $this->addAdsHistory($user,$advertisement->id);
+                    }
+
+                    unset($advertisement->getSeenHistory);
                     return $this->SuccessResponse(200, 'Advertisement detail get successfully',$advertisement);
                 }
                 return $this->ErrorResponse(404, 'Advertisement not found');
