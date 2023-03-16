@@ -266,5 +266,31 @@ class UserController extends Controller
             return $this->ErrorResponse(500, 'Something Went Wrong');
         }
     }    
+
+    // Update Device Token
+    public function updateDeviceToken(Request $request)
+    {
+        try {
+            $user = auth()->user();
+            if(!empty($user)){
+                $validator= Validator::make($request->all(),[
+                    'device_type' => 'required|in:ios,android',
+                    'device_token'=>'required',
+                ]);
+                if($validator->fails()){
+                    return $this->ErrorResponse(400,$validator->errors()->first());
+                }
+                $user->device_type = $request->device_type;
+                $user->device_token = $request->device_token;
+                $user->save(); 
+                return $this->SuccessResponse(200, 'Device token updated successfully',$user);
+            }
+            return $this->ErrorResponse(401, 'Unauthenticated');
+        } catch (Exception $exception) {
+            logger('error occurred in addresses fetching process');
+            logger(json_encode($exception));
+            return $this->ErrorResponse(500, 'Something Went Wrong');
+        }
+    }    
     
 }

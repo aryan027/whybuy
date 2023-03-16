@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'whybuy'),
 
     /*
     |--------------------------------------------------------------------------
@@ -216,4 +216,5 @@ return [
         'PDF' => Barryvdh\DomPDF\Facade::class,
     ])->toArray(),
 
+    'SERVER_API_KEY' => 'AAAA_rUpmQQ:APA91bGC6uYhmVmHwi2leq6OYHDf9lL9mNARIm-5S-E15ge2Rx95ae4monhKRpmJOoXoJpHOufZVwWWMQJT6TqBaqCs15fzcNpWZBdP5av_zZuO4JRJghTbjACLn9CEx3XUzVG3w1Vxd',    
 ];
