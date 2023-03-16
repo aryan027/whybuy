@@ -98,7 +98,7 @@ class AdController extends Controller
                 if($start_budget && $end_budget){
                     $ads = $ads->whereBetween('deposit_amount',[$start_budget,$end_budget]);
                 }
-                
+
                 if($latitude && $longitude){
                     $ads = $ads->select('*', \DB::raw(sprintf(
                         '(6371 * acos(cos(radians(%1$.7f)) * cos(radians(`latitude`)) * cos(radians(`longitude`) - radians(%2$.7f)) + sin(radians(%1$.7f)) * sin(radians(`latitude`)))) AS distance',
@@ -133,12 +133,11 @@ class AdController extends Controller
         return $this->SuccessResponse(200, 'Advertisement Fetched Successfully', $ads);
     }
 
-    // Get app address for particular user   
+    // Get app address for particular user
     public function published(Request $request)
     {
         try {
             $user = auth()->user();
-            
             if(!empty($user)){
                 $validator= Validator::make($request->all(),[
                     'advertisent_id'=>'required|integer|exists:advertisements,id',
@@ -273,5 +272,31 @@ class AdController extends Controller
             return $this->ErrorResponse(500, 'Something Went Wrong');
         }
     }
-    
+    public function AdvertisementBySub(Request $request)
+    {
+        try {
+            $user = auth()->user();
+            if(!empty($user)){
+                $validator= Validator::make($request->all(),[
+                    'sub_category'=>'required|integer',
+                ]);
+                if($validator->fails()){
+                    return $this->ErrorResponse(400,$validator->errors()->first());
+                }
+
+                $ads = Advertisement::with('subCategory', 'category')->where(['sub_category' => $request['sub_category'],'status' => true, 'approved' => true, 'published' => true])->get();
+                $ads = collect($ads)->map(function($q) {
+                    $q->media = ($q->getFirstMediaUrl('ads'));
+                    return $q;
+                });
+                return $this->SuccessResponse(200, 'Advertisement Fetched Successfully', $ads);
+            }
+            return $this->ErrorResponse(500, 'Something Went Wrong');
+        } catch (Exception $exception) {
+            logger('error occurred in addresses fetching process');
+            logger(json_encode($exception));
+            return $this->ErrorResponse(500, 'Something Went Wrong');
+        }
+    }
+
 }

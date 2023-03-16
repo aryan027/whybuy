@@ -48,6 +48,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get('/', [AdController::class, 'adsListing']);
         Route::post('advertisement-detail', [AdController::class, 'AdvertisementDetail']);
         Route::post('owner-profile', [AdController::class, 'ownerProfile']);
+        Route::post('ads/by/subcategory', [AdController::class, 'AdvertisementBySub']);
     });
 });
 
@@ -57,6 +58,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post('/update', [AdController::class, 'updateAdvertisement']);
         Route::get('/', [AdController::class, 'myAds']);
         Route::post('/published', [AdController::class, 'published']);
+
     });
 
     Route::group(['prefix' =>'wallet'],function (){
