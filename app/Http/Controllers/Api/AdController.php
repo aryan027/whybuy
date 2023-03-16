@@ -304,7 +304,6 @@ class AdController extends Controller
                 if($validator->fails()){
                     return $this->ErrorResponse(400,$validator->errors()->first());
                 }
-
                 $ads = Advertisement::with('subCategory', 'category')->where(['sub_category' => $request['sub_category'],'status' => true, 'approved' => true, 'published' => true])->get();
                 $ads = collect($ads)->map(function($q) {
                     $q->media = ($q->getFirstMediaUrl('ads'));
