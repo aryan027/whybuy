@@ -49,7 +49,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get('/', [AdController::class, 'adsListing']);
         Route::post('advertisement-detail', [AdController::class, 'AdvertisementDetail']);
         Route::post('owner-profile', [AdController::class, 'ownerProfile']);
-        Route::post('ads/by/subcategory', [AdController::class, 'AdvertisementBySub']);
+        Route::post('/by/subcategory', [AdController::class, 'AdvertisementBySub']);
     });
 });
 
