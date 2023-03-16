@@ -54,10 +54,6 @@ class Advertisement extends Model implements HasMedia
         return $this->hasMany(AdsSeenHistory::class,'ads_id');
     }
 
-    public function getRetingReview(){
-        return $this->hasMany(AdsRating::class,'ads_id');
-    }
-
     public function registerMediaConversions(Media $media = null): void
     {
         $this->addMediaConversion('thumb')

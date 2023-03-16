@@ -66,7 +66,7 @@ class WalletController extends Controller
                 }
                 $this->check_balance($ad, $wallet);
                 if (!empty($ad['id'])) {
-                    $wallet->update(['balance' => $wallet['balance'] - $rent['block'], 'hold' => $rent['block']]);
+                    $wallet->update(['balance' => $wallet['balance'] - $rent['deposite_amount'], 'hold' => $rent['deposite_amount']]);
                     $request['type'] = 0;
                     $request['user_id'] = auth()->id();
                     $request['rent_id'] = $rent['rent_id'];
@@ -213,20 +213,20 @@ class WalletController extends Controller
                 }
                 $wallet = Wallet::where('user_id', auth()->id())->first();
                 $update = $rent->update([
-                    'status' => 2,
+                    'status' => 3,
                 ]);
                 if ($update) {
 
                     $request['type'] = 1;
                     $request['user_id'] = auth()->id();
-                    $request['amount'] = $rent['block'];
+                    $request['amount'] = $rent['deposite_amount'];
                     $request['ad_id'] = $rent['ads_id'];
                     $request['remark'] = 'released blocked amount';
                     $request['txn_status'] = 'success';
                     $request['txn_id'] = IdGenerator::generate(['table' => 'transaction_histories', 'field' => 'txn_id', 'length' => 16, 'prefix' => date('Y') . '-' . auth()->id() . '-']);
                     $trans = TransactionHistory::create($request->all());
                     if ($trans) {
-                        $wallet->update(['balance' => $wallet['balance'] + $rent['block'], 'hold' => $wallet['hold'] - $rent['block']]);
+                        $wallet->update(['balance' => $wallet['balance'] + $rent['deposite_amount'], 'hold' => $wallet['hold'] - $rent['deposite_amount']]);
                         return $this->SuccessResponse(200, 'Amount release successfully ..!');
                     }
                 }

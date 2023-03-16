@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('packages', function (Blueprint $table) {
             $table->integer('durations');
             $table->longText('description');
-            $table->enum('type',['free,paid']);
+            $table->enum('type',['free','paid']);
         });
     }
 
