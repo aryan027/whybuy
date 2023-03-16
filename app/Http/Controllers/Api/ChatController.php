@@ -32,11 +32,13 @@ class ChatController extends Controller
         }
     }
 
-    public function sendMessage(Request $request, $cid) {
+    public function sendMessage(Request $request) {
         $validator = Validator::make($request->all(), [
             'message' => 'nullable|string',
-            'media' => 'nullable|mimes:jpg,jpeg,png'
+            'media' => 'nullable|mimes:jpg,jpeg,png',
+            'cid' => 'required'
         ]);
+        $cid= $request['cid'];
         if ($validator->fails()) {
             return $this->ErrorResponse(401, 'Input validation failed');
         }
@@ -103,7 +105,7 @@ class ChatController extends Controller
     }
 
     public function listingOfUser() {
-        $chats = ChatInteractions::with('ownerInfo', 'userInfo', 'chats')->where(['owner_id' => auth()->id(), 'status' => true])->get();
+        $chats = ChatInteractions::with('ownerInfo', 'userInfo', 'chats')->where(['user_id' => auth()->id(), 'status' => true])->get();
         return $this->SuccessResponse(200, 'Listing Fetched', $chats);
     }
 }
