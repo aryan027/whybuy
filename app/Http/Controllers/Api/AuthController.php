@@ -115,6 +115,7 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return $this->ErrorResponse(403, $validator->errors()->messages());
         }
+        $message= $request['mobile']==''?'email id':'mobile number';
 
         if (!user::where('mobile', $request->mobile)->orWhere('email',$request->email)->exists()) {
             return $this->ErrorResponse(400, 'User does not exists ..! Kindly register ');
@@ -139,7 +140,7 @@ class AuthController extends Controller
         if (!$send) {
             return $this->ErrorResponse(400, 'Something went wrong. Please try again after sometime');
         }
-        return $this->SuccessResponse(200, 'Otp has been sent to your register mobile number', array('token' => $send->token));
+        return $this->SuccessResponse(200, 'Otp has been sent to your register {$message}', array('token' => $send->token));
     }
 
     public function validateStatus(){
