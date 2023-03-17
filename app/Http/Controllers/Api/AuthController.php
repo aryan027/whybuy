@@ -17,7 +17,7 @@ class AuthController extends Controller
             'mobile' => 'required|digits:10'
         ]);
         if ($validator->fails()) {
-            return $this->ErrorResponse(403, $validator->errors()->messages());
+            return $this->ErrorResponse(403, $validator->errors()->first());
         }
         if (user::where('mobile', $request->mobile)->exists()) {
             return $this->ErrorResponse(409, 'User already exists ..! Kindly login');
@@ -43,6 +43,7 @@ class AuthController extends Controller
         }
         return $this->SuccessResponse(200, 'Otp has been sent to your register mobile number', array('token' => $send->token));
     }
+
     public function authentication(){
         return $this->ErrorResponse(401,'authentication failed');
     }
@@ -69,7 +70,8 @@ class AuthController extends Controller
         }
         $data= Temp_token::where(['token' =>$request->token,'otp'=>$request->otp,'is_login'=>false,'is_expired'=>false])->first();
         $user= User::create([
-            'mobile'=>$data->mobile
+            'mobile'=>$data->mobile ?? '',
+            'email'=>$data->email ?? ''
         ]);
         $data->delete();
         if(!$user){
@@ -95,7 +97,7 @@ class AuthController extends Controller
             return $this->ErrorResponse(400,'Otp is not valid/expired ..!');
         }
         $data= Temp_token::where(['token' =>$token,'otp'=>$otp,'is_login'=>true,'is_expired'=>false])->first();
-        $user= User::where('mobile',$data->mobile)->first();
+        $user= User::where('mobile',$data->mobile)->orWhere('email',$data->email)->first();
         $data->delete();
         if(!$user){
             return $this->ErrorResponse(400,'Something went wrong ..!');
@@ -107,24 +109,26 @@ class AuthController extends Controller
     }
     public function login(Request $request){
         $validator = Validator::make($request->all(), [
-            'mobile' => 'required|digits:10',
+            'mobile' => 'required_without:email|digits:10',
+            'email'=>'required_without:mobile|email'
         ]);
         if ($validator->fails()) {
             return $this->ErrorResponse(403, $validator->errors()->messages());
         }
 
-        if (!user::where('mobile', $request->mobile)->exists()) {
+        if (!user::where('mobile', $request->mobile)->orWhere('email',$request->email)->exists()) {
             return $this->ErrorResponse(400, 'User does not exists ..! Kindly register ');
         }
-        if (user::where(['mobile'=> $request->mobile,'status'=> false])->exists()) {
+        if (user::where(['mobile'=> $request->mobile,'status'=> false])->orWhere('email',$request->email)->exists()) {
             return $this->ErrorResponse(400, 'Your account is disable kindly contact to administrator ..!');
         }
 
 //        $otp = rand(99999, 1000000);
         $otp = '123456';
-        $token = md5($request->mobile . time());
+        $token = md5($request->mobile ??$request->email . time());
         $send = Temp_token::create([
-            'mobile' => $request['mobile'],
+            'mobile' => $request['mobile']??'',
+            'email' => $request['email']??'',
             'otp' => $otp,
             'token' => $token,
             'is_login'=> true
@@ -174,6 +178,38 @@ class AuthController extends Controller
         auth()->user()->tokens()->delete();
         return $this->SuccessResponse(200, 'password created successfully ..!');
 
+    }
+
+    public function register_with_email(Request $request){
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email'
+        ]);
+        if ($validator->fails()) {
+            return $this->ErrorResponse(403, $validator->errors()->first());
+        }
+        if (user::where('email', $request->email)->exists()) {
+            return $this->ErrorResponse(409, 'User already exists ..! Kindly login');
+        }
+        $verified = Temp_token::where('email',  $request['email'])->where('created_at', '>=', Carbon::now()->subMinutes(10)->toDateTimeString())->where(['is_expired'=> false,'is_login'=> false])->first();
+        if ($verified) {
+            return $this->SuccessResponse(200, 'Otp already send to your registered  mobile number', null);
+        }
+//        $otp = rand(99999, 1000000);
+        $otp= '123456';
+        $token = md5($request->email . time());
+        $send = Temp_token::create([
+            'email' => $request['email'],
+            'otp' => $otp,
+            'token' => $token,
+            'is_login'=> false
+        ]);
+//        $sms= "https://www.fast2sms.com/dev/bulkV2?authorization=wvicxQVfhgG17T8uSbjKoeJWPzpUlMRZ64IYqaFNy5nsE9Ck2DO5CQIwRhE14rxa0DtpTV7UieZfFlbk&variables_values=".$otp."&route=otp&numbers=".$request->mobile;
+//        file_get_contents($sms);
+
+        if (!$send) {
+            return $this->ErrorResponse(400, 'Something went wrong. Please try again after sometime');
+        }
+        return $this->SuccessResponse(200, 'Otp has been sent to your register email id', array('token' => $send->token));
     }
 
 
