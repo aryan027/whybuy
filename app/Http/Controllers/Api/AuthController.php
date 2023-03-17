@@ -140,7 +140,7 @@ class AuthController extends Controller
         if (!$send) {
             return $this->ErrorResponse(400, 'Something went wrong. Please try again after sometime');
         }
-        return $this->SuccessResponse(200, 'Otp has been sent to your register {$message}', array('token' => $send->token));
+        return $this->SuccessResponse(200, "Otp has been sent to your register {{$message}}", array('token' => $send->token));
     }
 
     public function validateStatus(){
