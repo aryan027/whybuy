@@ -119,7 +119,7 @@ class AuthController extends Controller
         if (!user::where('mobile', $request->mobile)->orWhere('email',$request->email)->exists()) {
             return $this->ErrorResponse(400, 'User does not exists ..! Kindly register ');
         }
-        if (user::where(['mobile'=> $request->mobile,'status'=> false])->orWhere('email',$request->email)->exists()) {
+        if (user::where(['mobile'=> $request->mobile])->orWhere('email',$request->email)->where(['status'=> false])->exists()) {
             return $this->ErrorResponse(400, 'Your account is disable kindly contact to administrator ..!');
         }
 
