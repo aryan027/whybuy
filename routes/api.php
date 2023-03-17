@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\FavouriteController;
+use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\PackageController;
 use App\Http\Controllers\Api\RentItemController;
 use App\Http\Controllers\Api\SubCategoryController;
@@ -31,6 +32,7 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
 });
 
 Route::post('register',[AuthController::class,'register']);
+Route::post('register/email',[AuthController::class,'register_with_email']);
 Route::post('verify',[AuthController::class,'verify_otp']);
 Route::post('login',[AuthController::class,'login']);
 Route::get('authentication',[AuthController::class,'authentication'])->name('authentication');
@@ -81,7 +83,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
        Route::post('/item/owner-accept-agreement',[RentItemController::class,'ownerAcceptAgreement']);
        Route::post('/item/user-confirm-agreement',[RentItemController::class,'userConfirmAgreement']);
        Route::post('/item/invoice',[RentItemController::class,'invoice']);
-       
+
     });
     Route::get('packages',[PackageController::class,'package_listing']);
     Route::post('subscribe',[PackageController::class,'subscription']);
@@ -132,3 +134,5 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
 Route::get('about-us',[AboutUsController::class,'AboutUs']);
 Route::get('authentication',[AuthController::class,'authentication'])->name('authentication');
+Route::get('login/google', [LoginController::class,'redirectToGoogle']);
+Route::get('login/google/callback', [LoginController::class,'handleGoogleCallback']);
