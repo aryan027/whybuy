@@ -75,8 +75,14 @@ class ChatController extends Controller
         return $this->SuccessResponse(200, 'message sent successfully', $message);
     }
 
-    public function adChatList($aid) {
-        $advertisement = Advertisement::find($aid);
+    public function adChatList(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'aid' => 'string',
+        ]);
+        if ($validator->fails()) {
+            return $this->ErrorResponse(401, $validator->all());
+        }
+        $advertisement = Advertisement::find($request->aid);
         if (!$advertisement) {
             return $this->ErrorResponse(404, 'Advertisement not found');
         }

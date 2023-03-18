@@ -93,7 +93,7 @@ class UserController extends Controller
             logger(json_encode($exception));
             return $this->ErrorResponse(500, 'Something Went Wrong');
         }
-   }    
+   }
 
 
     // add user
@@ -130,7 +130,7 @@ class UserController extends Controller
         }
    }
 
-    // Get app address for particular user   
+    // Get app address for particular user
    public function getAddress(Request $request)
    {
         try {
@@ -148,12 +148,12 @@ class UserController extends Controller
    }
 
     // Get app address detail
-    public function getAddressDetail(Request $request, $id)
+    public function getAddressDetail(Request $request)
     {
         try {
             $user = auth()->user();
             if(!empty($user)){
-                $addresses = $this->addresses->where(['id' => $id,'user_id' => $user->id])->first();
+                $addresses = $this->addresses->where(['id' => $request->id,'user_id' => $user->id])->first();
                 if(!empty($addresses)){
                     return $this->SuccessResponse(200, 'Address get successfully',$addresses);
                 }
@@ -168,12 +168,12 @@ class UserController extends Controller
     }
 
     // Update address
-    public function updateAddress(Request $request, $id)
+    public function updateAddress(Request $request)
     {
         try {
             $user = auth()->user();
             if(!empty($user)){
-                $addresses = $this->addresses->where(['id' => $id,'user_id' => $user->id])->first();
+                $addresses = $this->addresses->where(['id' => $request->id,'user_id' => $user->id])->first();
                 if(!empty($addresses)){
                     $validator= Validator::make($request->all(),[
                         'address'=>'required',
@@ -204,12 +204,12 @@ class UserController extends Controller
     }
 
     // Delete address
-    public function deleteAddress(Request $request, $id)
+    public function deleteAddress(Request $request)
     {
         try {
             $user = auth()->user();
             if(!empty($user)){
-                $addresses = $this->addresses->where(['id' => $id,'user_id' => $user->id])->first();
+                $addresses = $this->addresses->where(['id' => $request['id'],'user_id' => $user->id])->first();
                 if(!empty($addresses)){
                     $addresses->delete();
                     return $this->SuccessResponse(200, 'Address deleted successfully');
@@ -247,7 +247,7 @@ class UserController extends Controller
             logger(json_encode($exception));
             return $this->ErrorResponse(500, 'Something Went Wrong');
         }
-    }    
+    }
 
      // Delete Account
     public function deleteAccount(Request $request)
@@ -265,7 +265,7 @@ class UserController extends Controller
             logger(json_encode($exception));
             return $this->ErrorResponse(500, 'Something Went Wrong');
         }
-    }    
+    }
 
     // Update Device Token
     public function updateDeviceToken(Request $request)
@@ -282,7 +282,7 @@ class UserController extends Controller
                 }
                 $user->device_type = $request->device_type;
                 $user->device_token = $request->device_token;
-                $user->save(); 
+                $user->save();
                 return $this->SuccessResponse(200, 'Device token updated successfully',$user);
             }
             return $this->ErrorResponse(401, 'Unauthenticated');
@@ -291,6 +291,6 @@ class UserController extends Controller
             logger(json_encode($exception));
             return $this->ErrorResponse(500, 'Something Went Wrong');
         }
-    }    
-    
+    }
+
 }

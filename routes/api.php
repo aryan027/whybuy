@@ -98,7 +98,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post('send', [ChatController::class, 'sendMessage']);
         Route::post('{cid}/delete', [ChatController::class, 'deleteChat']);
         Route::post('delete/all', [ChatController::class, 'deleteAllChat']);
-        Route::get('list/{aid}', [ChatController::class, 'adChatList']);
+        Route::post('list/aid', [ChatController::class, 'adChatList']);
         Route::get('user/list', [ChatController::class, 'listingOfUser']);
     });
 
@@ -112,9 +112,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         //Address module
         Route::post('add-address', [UserController::class, 'addAddress']);
         Route::get('get-address', [UserController::class, 'getAddress']);
-        Route::get('get-address-detail/{id}', [UserController::class, 'getAddressDetail']);
-        Route::put('update-address/{id}', [UserController::class, 'updateAddress']);
-        Route::delete('delete-address/{id}', [UserController::class, 'deleteAddress']);
+        Route::post('get-address-detail', [UserController::class, 'getAddressDetail']);
+        Route::post('update-address', [UserController::class, 'updateAddress']);
+        Route::delete('delete-address', [UserController::class, 'deleteAddress']);
 
         Route::post('user-report', [UserController::class, 'userReport']);
 
