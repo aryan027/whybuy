@@ -14,7 +14,13 @@ class NotificationController extends Controller
         try {
             $user = auth()->user();
             if(!empty($user)){
-                $notification = $this->notification::with('getRentItem','getRentItem.ads')->where('receiver_id',$user->id)->paginate(20);
+                $validator= Validator::make($request->all(),[
+                    'status'=>'required|in:1,2,3,4',
+                ]);
+                if($validator->fails()){
+                    return $this->ErrorResponse(400,$validator->errors()->first());
+                }
+                $notification = $this->notification::with('getRentItem','getRentItem.ads','getRentItem.ads.media','getSenderUser','getSenderUser.media')->where(['receiver_id' => $user->id,'status' => $request->status])->paginate(20);
                 return  $this->SuccessResponse(200,'Notification Fetched!',$notification);  
             }
             return $this->ErrorResponse(401, 'Unauthenticated');

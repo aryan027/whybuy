@@ -189,7 +189,7 @@ class AdController extends Controller
                     return $this->ErrorResponse(400,$validator->errors()->first());
                 }
 
-                $advertisement = Advertisement::with('subCategory', 'category','user')->where('id',$request->advertisent_id)->first();
+                $advertisement = Advertisement::with('subCategory', 'category','user','user.media')->where('id',$request->advertisent_id)->first();
                 if(!empty($advertisement)){
                     $favotiteAds = FavouriteAds::where(['user_id' => $user->id,'ads_id' => $advertisement->id])->first();
                     $advertisement->seen_count = (count($advertisement->getSeenHistory) > 0) ? $advertisement->getSeenHistory->count() : 0;
@@ -319,4 +319,11 @@ class AdController extends Controller
         }
     }
 
+    public function addAdsHistory($user,$advertisementId)
+    {
+       $adsSeenHistory = new AdsSeenHistory;
+       $adsSeenHistory->user_id = $user->id;
+       $adsSeenHistory->ads_id = $advertisementId;
+       $adsSeenHistory->save();
+    }
 }

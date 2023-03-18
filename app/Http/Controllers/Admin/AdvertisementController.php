@@ -95,9 +95,10 @@ class AdvertisementController extends Controller
                     if($advertisement->approved == 0){
                         $type = 'approved_advertisement';
                         $message = 'Approved your '.$advertisement->title.' Advertisement';
+                        $status = 2; //Approved
                         $senderId = \Auth::user()->id;
                         $receiverId = $advertisement->user_id;
-                        $this->storeAdvertisementNotification($senderId,$receiverId,$advertisement->id,$type,$message);
+                        $this->storeAdvertisementNotification($senderId,$receiverId,$status ,$advertisement->id,$type,$message);
                     }
                     $advertisement->approved = ($advertisement->approved == 0) ? 1 : 0;
                     if($request->reason != ''){

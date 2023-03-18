@@ -16,4 +16,8 @@ class Notification extends Model
     public function getRentItem(){
         return $this->belongsTo(RentItem::class,'rent_item_id');
     }
+
+    public function getSenderUser(){
+        return $this->belongsTo(User::class,'sender_id');
+    }
 }
