@@ -77,7 +77,7 @@ class ChatController extends Controller
 
     public function adChatList(Request $request) {
         $validator = Validator::make($request->all(), [
-            'aid' => 'string',
+            'aid' => 'required',
         ]);
         if ($validator->fails()) {
             return $this->ErrorResponse(401, $validator->all());
