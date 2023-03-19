@@ -322,7 +322,7 @@ class RentItemController extends Controller
                                 $status = 2; //Approved
                                 $senderId = $rentItem->user_id;
                                 $receiverId = $rentItem->owner_id;
-                                $this->storeNotification($senderId,$receiverId,$rentItem->id,$type,$message);
+                                $this->storeNotification($senderId,$receiverId,$status,$rentItem->id,$type,$message);
                             }
                             $data = [
                                 'invoice' => asset('/').$rentItem->invoice
