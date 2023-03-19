@@ -71,7 +71,8 @@ class AuthController extends Controller
         $data= Temp_token::where(['token' =>$request->token,'otp'=>$request->otp,'is_login'=>false,'is_expired'=>false])->first();
         $user= User::create([
             'mobile'=>$data->mobile ?? '',
-            'email'=>$data->email ?? ''
+            'email'=>$data->email ?? '',
+            'status'=>true
         ]);
         $data->delete();
         if(!$user){
@@ -120,7 +121,7 @@ class AuthController extends Controller
         if (!user::where('mobile', $request->mobile)->orWhere('email',$request->email)->exists()) {
             return $this->ErrorResponse(400, 'User does not exists ..! Kindly register ');
         }
-        if (user::where(['mobile'=> $request->mobile])->orWhere('email',$request->email)->where(['status'=> false])->exists()) {
+        if (user::where(['status'=> false])->orWhere(['mobile'=> $request->mobile])->orWhere('email',$request->email)->exists()) {
             return $this->ErrorResponse(400, 'Your account is disable kindly contact to administrator ..!');
         }
 
