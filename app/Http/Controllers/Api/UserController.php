@@ -182,7 +182,7 @@ class UserController extends Controller
                         'country_id'=>'required|exists:countries,id',
                     ]);
                     if($validator->fails()){
-                        return $this->ErrorResponse(400,$validator->errors()->first());
+                        return $this->ErrorResponse(200,$validator->errors()->first());
                     }
                     $addresses->address = $request->address;
                     $addresses->city = $request->city;
@@ -193,9 +193,9 @@ class UserController extends Controller
                     $addresses->save();
                     return $this->SuccessResponse(200, 'Address updated successfully',$addresses);
                 }
-            return $this->ErrorResponse(404, 'Address not found');
+            return $this->ErrorResponse(200, 'Address not found');
             }
-            return $this->ErrorResponse(500, 'Something Went Wrong');
+            return $this->ErrorResponse(200, 'Something Went Wrong');
         } catch (Exception $exception) {
             logger('error occurred in addresses fetching process');
             logger(json_encode($exception));
@@ -214,7 +214,7 @@ class UserController extends Controller
                     $addresses->delete();
                     return $this->SuccessResponse(200, 'Address deleted successfully');
                 }
-                return $this->ErrorResponse(404, 'Address not found');
+                return $this->ErrorResponse(200, 'Address not found');
             }
             return $this->ErrorResponse(500, 'Something Went Wrong');
         } catch (Exception $exception) {
@@ -234,7 +234,7 @@ class UserController extends Controller
                     'report_type'=>'required',
                 ]);
                 if($validator->fails()){
-                    return $this->ErrorResponse(400,$validator->errors()->first());
+                    return $this->ErrorResponse(200,$validator->errors()->first());
                 }
                 $user->report_type = $request->report_type;
                 $user->report_comment = $request->report_comment;
@@ -278,7 +278,7 @@ class UserController extends Controller
                     'device_token'=>'required',
                 ]);
                 if($validator->fails()){
-                    return $this->ErrorResponse(400,$validator->errors()->first());
+                    return $this->ErrorResponse(200,$validator->errors()->first());
                 }
                 $user->device_type = $request->device_type;
                 $user->device_token = $request->device_token;

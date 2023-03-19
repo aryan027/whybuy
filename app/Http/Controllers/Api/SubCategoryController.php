@@ -60,7 +60,7 @@ class SubCategoryController extends Controller
                     'category_id'=>'required|integer|exists:categories,id',
                 ]);
                 if($validator->fails()){
-                    return $this->ErrorResponse(400,$validator->errors()->first());
+                    return $this->ErrorResponse(200,$validator->errors()->first());
                 }
                 $subCategory = SubCategory::with('category')->where('category_id', $request->category_id)->first();
                 if(!empty($subCategory)){
@@ -68,7 +68,7 @@ class SubCategoryController extends Controller
                     unset($subCategory['media']);
                     return $this->SuccessResponse(200, 'Category get successfully',$subCategory);
                 }
-                return $this->ErrorResponse(404, 'Category not found');
+                return $this->ErrorResponse(200, 'Category not found');
             }
             return $this->ErrorResponse(500, 'Something Went Wrong');
         } catch (Exception $exception) {
@@ -103,7 +103,7 @@ class SubCategoryController extends Controller
                     'sub_category_id'=>'required|integer|exists:sub_categories,id',
                 ]);
                 if($validator->fails()){
-                    return $this->ErrorResponse(400,$validator->errors()->first());
+                    return $this->ErrorResponse(200,$validator->errors()->first());
                 }
                 $subCategory = SubCategory::where('id', $request->sub_category_id)->first();
                 if(!empty($subCategory)){
@@ -111,9 +111,9 @@ class SubCategoryController extends Controller
                     unset($subCategory['media']);
                     return $this->SuccessResponse(200, 'Sub category get successfully',$subCategory);
                 }
-                return $this->ErrorResponse(404, 'Sub category not found');
+                return $this->ErrorResponse(200, 'Sub category not found');
             }
-            return $this->ErrorResponse(500, 'Something Went Wrong');
+            return $this->ErrorResponse(200, 'Something Went Wrong');
         } catch (Exception $exception) {
             logger('error occurred in addresses fetching process');
             logger(json_encode($exception));

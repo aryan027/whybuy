@@ -16,7 +16,7 @@ class ChatController extends Controller
             'ad_id' => 'required|exists:advertisements,id'
         ]);
         if ($validator->fails()) {
-            return $this->ErrorResponse(401, 'Input validation failed');
+            return $this->ErrorResponse(200, 'Input validation failed');
         }
         $advertisement = Advertisement::find($request['ad_id']);
         $exist = ChatInteractions::where(['advertisement_id' => $advertisement['id'], 'user_id' => auth()->id(), 'status' => true])->first();
@@ -40,14 +40,14 @@ class ChatController extends Controller
         ]);
         $cid= $request['cid'];
         if ($validator->fails()) {
-            return $this->ErrorResponse(401, 'Input validation failed');
+            return $this->ErrorResponse(200, 'Input validation failed');
         }
         if (!$request['message'] && !$request->hasFile('media')) {
-            return $this->ErrorResponse(401, 'Nothing to send');
+            return $this->ErrorResponse(200, 'Nothing to send');
         }
         $init = ChatInteractions::find($cid);
         if (!$init['status']) {
-            return $this->ErrorResponse(404, 'Can not send chat! may be deleted');
+            return $this->ErrorResponse(200, 'Can not send chat! may be deleted');
         }
         $data = array(
             'content' => $request['message'] ?? null,
@@ -80,11 +80,11 @@ class ChatController extends Controller
             'aid' => 'required',
         ]);
         if ($validator->fails()) {
-            return $this->ErrorResponse(401, $validator->all());
+            return $this->ErrorResponse(200, $validator->all());
         }
         $advertisement = Advertisement::find($request->aid);
         if (!$advertisement) {
-            return $this->ErrorResponse(404, 'Advertisement not found');
+            return $this->ErrorResponse(200, 'Advertisement not found');
         }
         $chats = ChatInteractions::with('ownerInfo', 'userInfo', 'chats')->where(['owner_id' => $advertisement['user_id'], 'advertisement_id' => $advertisement['id'], 'status' => true])->get();
         return $this->SuccessResponse(200, 'fetched successfully', $chats);
@@ -93,19 +93,25 @@ class ChatController extends Controller
     public function deleteChat($cid) {
         $chat = ChatInteractions::find($cid);
         if (!$chat || $chat['user_id'] !== auth()->id()) {
-            return $this->ErrorResponse(404, 'Chat not found');
+            return $this->ErrorResponse(200, 'Chat not found');
         }
         if ($chat->update(['status' => false])) {
             return $this->SuccessResponse(200, 'Chat deleted successfully');
         } else {
-            return $this->ErrorResponse(500, 'Something Went Wrong');
+            return $this->ErrorResponse(200, 'Something Went Wrong');
         }
     }
 
     public function deleteAllChat(Request $request) {
-        $chats = ChatInteractions::where(['user_id' => auth()->id()])->get();
-        foreach ($chats as $chat) {
-            $chat->update(['status' => false]);
+
+        $chatIds = $request->input('chatIds');
+        if (empty($userIds)) {
+            return $this->ErrorResponse(200,'No Chat ids provide');
+        }
+        $myArray = explode(',', $chatIds);
+        foreach ($myArray as $chat) {
+          $c= ChatInteractions::where(['user_id' => auth()->id(),'id'=> $chat])->get();
+            $c->update(['status' => false]);
         }
         return $this->SuccessResponse(200, 'All Chats deleted successfully');
     }

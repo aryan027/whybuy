@@ -18,11 +18,11 @@ class FavouriteController extends Controller
                     'ads_id'=> 'required|integer|exists:advertisements,id',
                 ]);
                 if($validator->fails()){
-                    return $this->ErrorResponse(400,$validator->errors()->first());
+                    return $this->ErrorResponse(200,$validator->errors()->first());
                 }
                 $getFevorite = FavouriteAds::where('ads_id',$request->ads_id)->where('user_id',$user->id)->first();
                 if(!empty($getFevorite)){
-                    return $this->ErrorResponse(409, 'You have already favorite this advertisement');
+                    return $this->ErrorResponse(200, 'You have already favorite this advertisement');
                 }
                 $favourite = FavouriteAds::create([
                     'ads_id'=>$request->ads_id,
@@ -30,11 +30,11 @@ class FavouriteController extends Controller
                 ]);
                 return $this->SuccessResponse(200,'Added to favourite successfully',$favourite);
             }
-            return $this->ErrorResponse(401, 'Unauthenticated');
+            return $this->ErrorResponse(200, 'Unauthenticated');
         } catch (Exception $exception) {
             logger('error occurred in user fetching process');
             logger(json_encode($exception));
-            return $this ->ErrorResponse(500, 'Something Went Wrong');
+            return $this ->ErrorResponse(200, 'Something Went Wrong');
         }
     }
 
@@ -45,7 +45,7 @@ class FavouriteController extends Controller
                 $favouriteAds= FavouriteAds::with('user','ads')->where('user_id',$user->id)->latest()->get();
                 return $this->SuccessResponse(200,'Data fetch successfully ..',$favouriteAds);
             }
-            return $this->ErrorResponse(401, 'Unauthenticated');
+            return $this->ErrorResponse(200, 'Unauthenticated');
         } catch (Exception $exception) {
             logger('error occurred in user fetching process');
             logger(json_encode($exception));
@@ -61,14 +61,14 @@ class FavouriteController extends Controller
                     'favotite_id'=> 'required|integer|exists:favourite_ads,id',
                 ]);
                 if($validator->fails()){
-                    return $this->ErrorResponse(400,$validator->errors()->first());
+                    return $this->ErrorResponse(200,$validator->errors()->first());
                 }
                 $favouriteAds= FavouriteAds::where(['id' => $request->favotite_id,'user_id' => $user->id])->first();
                 if(!empty($favouriteAds)){
                     $favouriteAds->delete();
                     return $this->SuccessResponse(200,'Remove successfully.',);
                 }
-                return $this->ErrorResponse(404, 'Favorite not found');
+                return $this->ErrorResponse(200, 'Favorite not found');
             }
             return $this->ErrorResponse(401, 'Unauthenticated');
         } catch (Exception $exception) {
@@ -77,5 +77,5 @@ class FavouriteController extends Controller
             return $this ->ErrorResponse(500, 'Something Went Wrong');
         }
     }
-    
+
 }
