@@ -65,6 +65,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post('/published', [AdController::class, 'published']);
 
     });
+    Route::post('review',[\App\Http\Controllers\Api\ReviewController::class,'review']);
+    Route::post('review/list',[\App\Http\Controllers\Api\ReviewController::class,'review_list']);
+    Route::post('review/list/user',[\App\Http\Controllers\Api\ReviewController::class,'review_user_list']);
 
     Route::group(['prefix' =>'wallet'],function (){
         Route::get('/',[\App\Http\Controllers\Api\WalletController::class,'wallet_details']);

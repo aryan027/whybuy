@@ -302,18 +302,18 @@ class AdController extends Controller
                     'sub_category'=>'required|integer',
                 ]);
                 if($validator->fails()){
-                    return $this->ErrorResponse(400,$validator->errors()->first());
+                    return $this->ErrorResponse(200,$validator->errors()->first());
                 }
-                $ads = Advertisement::with('subCategory', 'category')->where(['sub_category' => $request['sub_category'],'status' => true, 'approved' => true, 'published' => true])->get();
-                $ads = collect($ads)->map(function($q) {
-                    $q->media = ($q->getFirstMediaUrl('ads'));
-                    return $q;
-                });
+                $ads = Advertisement::with('subCategory', 'category')->where(['sub_category' => $request['sub_category'],'status' => true, 'approved' => true, 'published' => true])->get()->paginate(20);
+//                $ads = collect($ads)->map(function($q) {
+//                    $q->media = ($q->getFirstMediaUrl('ads'));
+//                    return $q;
+//                });
                 return $this->SuccessResponse(200, 'Advertisement Fetched Successfully', $ads);
             }
             return $this->ErrorResponse(500, 'Something Went Wrong');
         } catch (Exception $exception) {
-            logger('error occurred in addresses fetching process');
+            logger('error occurred in ads fetching process');
             logger(json_encode($exception));
             return $this->ErrorResponse(500, 'Something Went Wrong');
         }

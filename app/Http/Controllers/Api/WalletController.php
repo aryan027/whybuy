@@ -42,27 +42,26 @@ class WalletController extends Controller
             if (!empty($user)) {
                 $validator = Validator::make($request->all(), [
                     'type' => 'required|in:0,1,2',
-                    'amount' => 'required',
                     'remark' => 'nullable',
                     'payload' => 'nullable',
                     'rent_id' => 'required',
                     'txn_status' => 'nullable'
                 ]);
                 if ($validator->fails()) {
-                    return $this->ErrorResponse(400, $validator->errors()->first());
+                    return $this->ErrorResponse(200, $validator->errors()->first());
                 }
 
                 if (!Wallet::where('user_id', auth()->id())->exists()) {
-                    return $this->ErrorResponse(400, 'Wallet not found ..!');
+                    return $this->ErrorResponse(200, 'Wallet not found ..!');
                 }
                 $wallet = Wallet::where('user_id', auth()->id())->first();
                 $rent = RentItem::find($request['rent_id']);
                 if (empty($rent)) {
-                    return $this->ErrorResponse(400, 'Rental product not found');
+                    return $this->ErrorResponse(200, 'Rental product not found');
                 }
                 $ad = Advertisement::find($rent['ads_id']);
                 if (empty($ad)) {
-                    return $this->ErrorResponse(400, 'Ad not found');
+                    return $this->ErrorResponse(200, 'Ad not found');
                 }
                 $this->check_balance($ad, $wallet);
                 if (!empty($ad['id'])) {
@@ -73,7 +72,7 @@ class WalletController extends Controller
                     $request['txn_id'] = IdGenerator::generate(['table' => 'transaction_histories', 'field' => 'txn_id', 'length' => 16, 'prefix' => date('Y') . '-' . auth()->id() . '-']);
                     $trans = TransactionHistory::create($request->all());
                     if (!$trans) {
-                        return $this->ErrorResponse(500, 'Something went wrong while transaction ..!');
+                        return $this->ErrorResponse(200, 'Something went wrong while transaction ..!');
                     }
                     return $this->SuccessResponse(200, 'transaction successful ..!', $trans['txn_id']);
                 }
@@ -121,18 +120,18 @@ class WalletController extends Controller
                     'payment_method' => 'required|in:debit,credit,up'
                 ]);
                 if ($validator->fails()) {
-                    return $this->ErrorResponse(400, $validator->errors()->first());
+                    return $this->ErrorResponse(200, $validator->errors()->first());
                 }
                 $wallet = Wallet::where('user_id', auth()->id())->first();
                 if (!$wallet) {
-                    return $this->ErrorResponse(400, 'Wallet not found ..!');
+                    return $this->ErrorResponse(200, 'Wallet not found ..!');
                 }
                 $request['type'] = 1;
                 $request['user_id'] = auth()->id();
                 $request['txn_id'] = IdGenerator::generate(['table' => 'transaction_histories', 'field' => 'txn_id', 'length' => 16, 'prefix' => date('Y') . '-' . auth()->id() . '-']);
                 $trans = TransactionHistory::create($request->all());
                 if (!$trans) {
-                    return $this->ErrorResponse(500, 'Something went wrong while transaction ..!');
+                    return $this->ErrorResponse(200, 'Something went wrong while transaction ..!');
                 }
                 $wallet->update(['balance' => $wallet['balance'] + $request['amount']]);
                 return $this->SuccessResponse(200, 'balance added successfully ..!', $trans);
@@ -153,7 +152,7 @@ class WalletController extends Controller
             $user = auth()->user();
             if (!empty($user)) {
                 if (Wallet::where('user_id', auth()->id())->exists()) {
-                    return $this->ErrorResponse(400, 'Wallet already created ..!');
+                    return $this->ErrorResponse(200, 'Wallet already created ..!');
                 }
                 $wallet = Wallet::create([
                     'user_id' => auth()->id(),
@@ -200,7 +199,7 @@ class WalletController extends Controller
                     'rent_id' => 'required',
                 ]);
                 if ($validator->fails()) {
-                    return $this->ErrorResponse(400, $validator->errors()->first());
+                    return $this->ErrorResponse(200, $validator->errors()->first());
                 }
                 $rent = RentItem::where(['id' => $request['rent_id'], 'status' => 0])->first();
                 if (empty($rent)) {
