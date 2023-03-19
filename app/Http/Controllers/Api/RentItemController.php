@@ -372,6 +372,53 @@ class RentItemController extends Controller
             return $this->ErrorResponse(500, 'Something Went Wrong');
         }
     }
-    
 
+    // Cancel Item
+    public function cancelItem(Request $request){
+        try {
+            $user = auth()->user();
+            if(!empty($user)){
+                $validator= Validator::make($request->all(),[
+                    'rent_item_id'=>'required|integer|exists:rent_items,id',
+                    'cancel_reason'=>'required',
+                ]);
+                if($validator->fails()){
+                    return $this->ErrorResponse(400,$validator->errors()->first());
+                }
+                $rentItem = RentItem::where(['id' => $request->rent_item_id])->first();
+                if(!empty($rentItem)){
+                    if($rentItem->status == 3){
+                        return $this->ErrorResponse(409, 'This item already canceld.'); 
+                    }
+                    if($rentItem->status != 3){
+                        $rentItem->status = 3;
+                        $rentItem->cancel_by = $user->id;
+                        $rentItem->cancel_reason = $request->cancel_reason;
+                        $rentItem->save();
+                        if($rentItem){
+                            $senderId = $rentItem->owner_id;
+                            $receiverId = $rentItem->user_id;
+                            if($rentItem->user_id == $user->id){
+                                $senderId = $rentItem->user_id;
+                                $receiverId = $rentItem->owner_id;
+                            }
+                            $type = 'cancel_agreement';
+                            $message = 'Cancel Agreement';
+                            $status = 4; // Declined
+                            $this->storeNotification($senderId,$receiverId,$status,$rentItem->id,$type,$message);
+                        }
+                        return  $this->SuccessResponse(200,'Item canceled successfully.',$rentItem);    
+                    }
+                    return $this->ErrorResponse(409, 'You can not cancel item.Because this item already confired.'); 
+                }
+                return $this->ErrorResponse(404, 'Invalid rent'); 
+            }
+            return $this->ErrorResponse(401, 'Unauthenticated');
+        } catch (Exception $exception) {
+            logger('error occurred in user fetching process');
+            logger(json_encode($exception));
+            return $this->ErrorResponse(500, 'Something Went Wrong');
+        }
+    }
+    
 }
