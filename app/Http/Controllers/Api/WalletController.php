@@ -45,7 +45,8 @@ class WalletController extends Controller
                     'remark' => 'nullable',
                     'payload' => 'nullable',
                     'rent_id' => 'required',
-                    'txn_status' => 'nullable'
+                    'txn_status' => 'nullable',
+                    'amount'=>'required'
                 ]);
                 if ($validator->fails()) {
                     return $this->ErrorResponse(200, $validator->errors()->first());
