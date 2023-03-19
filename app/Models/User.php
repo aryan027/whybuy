@@ -37,6 +37,7 @@ class User extends Authenticatable implements HasMedia
         'latitude',
         'longitude',
         'last_login',
+        'status',
         'dob',
         'mobile',
 
