@@ -42,27 +42,26 @@ class WalletController extends Controller
             if (!empty($user)) {
                 $validator = Validator::make($request->all(), [
                     'type' => 'required|in:0,1,2',
-                    'amount' => 'required',
                     'remark' => 'nullable',
                     'payload' => 'nullable',
                     'rent_id' => 'required',
                     'txn_status' => 'nullable'
                 ]);
                 if ($validator->fails()) {
-                    return $this->ErrorResponse(400, $validator->errors()->first());
+                    return $this->ErrorResponse(200, $validator->errors()->first());
                 }
 
                 if (!Wallet::where('user_id', auth()->id())->exists()) {
-                    return $this->ErrorResponse(400, 'Wallet not found ..!');
+                    return $this->ErrorResponse(200, 'Wallet not found ..!');
                 }
                 $wallet = Wallet::where('user_id', auth()->id())->first();
                 $rent = RentItem::find($request['rent_id']);
                 if (empty($rent)) {
-                    return $this->ErrorResponse(400, 'Rental product not found');
+                    return $this->ErrorResponse(200, 'Rental product not found');
                 }
                 $ad = Advertisement::find($rent['ads_id']);
                 if (empty($ad)) {
-                    return $this->ErrorResponse(400, 'Ad not found');
+                    return $this->ErrorResponse(200, 'Ad not found');
                 }
                 $this->check_balance($ad, $wallet);
                 if (!empty($ad['id'])) {
@@ -73,7 +72,7 @@ class WalletController extends Controller
                     $request['txn_id'] = IdGenerator::generate(['table' => 'transaction_histories', 'field' => 'txn_id', 'length' => 16, 'prefix' => date('Y') . '-' . auth()->id() . '-']);
                     $trans = TransactionHistory::create($request->all());
                     if (!$trans) {
-                        return $this->ErrorResponse(500, 'Something went wrong while transaction ..!');
+                        return $this->ErrorResponse(200, 'Something went wrong while transaction ..!');
                     }
                     return $this->SuccessResponse(200, 'transaction successful ..!', $trans['txn_id']);
                 }
