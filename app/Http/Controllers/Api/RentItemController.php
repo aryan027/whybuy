@@ -74,9 +74,10 @@ class RentItemController extends Controller
                         if($item){
                             $type = 'send_for_accept_agreement';
                             $message = 'Accept agreement request for you';
+                            $status = 1; // request
                             $senderId = $item->user_id;
                             $receiverId = $item->owner_id;
-                            $this->storeNotification($senderId,$receiverId,$item->id,$type,$message);
+                            $this->storeNotification($senderId,$receiverId, $status ,$item->id,$type,$message);
                         }
                         return $this->SuccessResponse(200,'Rent Request send successfully',$item);
                     }
@@ -264,9 +265,10 @@ class RentItemController extends Controller
                         if($rentItem){
                             $type = 'accepted_agreement';
                             $message = 'Accept agreement from owner side. please accept agreement';
+                            $status = 2; //Approved
                             $senderId = $rentItem->owner_id;
                             $receiverId = $rentItem->user_id;
-                            $this->storeNotification($senderId,$receiverId,$rentItem->id,$type,$message);
+                            $this->storeNotification($senderId,$receiverId,$status,$rentItem->id,$type,$message);
                         }
                     }
                     return  $this->SuccessResponse(200,'Rental agreement accepted.');  
@@ -317,6 +319,7 @@ class RentItemController extends Controller
                             if($rentItem){
                                 $type = 'confirm_agreement';
                                 $message = 'Agreement confirmed';
+                                $status = 2; //Approved
                                 $senderId = $rentItem->user_id;
                                 $receiverId = $rentItem->owner_id;
                                 $this->storeNotification($senderId,$receiverId,$rentItem->id,$type,$message);
@@ -355,7 +358,7 @@ class RentItemController extends Controller
                 $rentItem = RentItem::where(['id' => $request->rent_item_id,'user_id' => $user->id])->first();
                 if(!empty($rentItem)){
                     $data = [
-                        'invoice' => asset('/storage/').'/'.$rentItem->invoice
+                        'invoice' => asset('/').$rentItem->invoice
                     ]; 
 
                     return  $this->SuccessResponse(200,'Invoice get successfully.',$data);    

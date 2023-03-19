@@ -73,7 +73,7 @@ class Controller extends BaseController
         return $this->SuccessResponse(200,"data fetch successfully ..!",$data);
     }
 
-    public function storeNotification($senderId,$receiverId,$rentItemId=Null,$type,$message)
+    public function storeNotification($senderId,$receiverId,$status,$rentItemId=Null,$type,$message)
     {
         $user = $this->user;
         if($senderId){
@@ -88,13 +88,14 @@ class Controller extends BaseController
             $notification->receiver_id = $receiverData->id;
             $notification->rent_item_id = $rentItemId;
             $notification->type = $type;
+            $notification->status = $status;
             $notification->message = $message;
             $notification->save();
             $this->SendMobileNotification($rentItemId,$receiverData,$message);
         }
     }
 
-    public function storeAdvertisementNotification($senderId,$receiverId,$ads_id=Null,$type,$message)
+    public function storeAdvertisementNotification($senderId,$receiverId,$status,$ads_id=Null,$type,$message)
     {
         $user = $this->user;
         if($receiverId){
@@ -106,6 +107,7 @@ class Controller extends BaseController
             $notification->receiver_id = $receiverData->id;
             $notification->ads_id = $ads_id;
             $notification->type = $type;
+            $notification->status = $status;
             $notification->message = $message;
             $notification->save();
             $this->SendMobileNotification($ads_id,$receiverData,$message);
