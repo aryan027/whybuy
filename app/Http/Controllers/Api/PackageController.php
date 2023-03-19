@@ -50,7 +50,7 @@ class PackageController extends Controller
 
     public function  subscriptionList(){
          $sub= Subscription::where('user_id',auth()->id())->latest()->get();
-         return $this->SuccessResponse('200','Data fetch successfully ..',$sub);
+         return $this->SuccessResponse(200,'Data fetch successfully ..',$sub);
     }
 
 }

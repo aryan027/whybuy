@@ -18,16 +18,16 @@ class CMSController extends Controller
                     'type'=>'required|in:terms_condition,privacy_policy,abount_us',
                 ]);
                 if($validator->fails()){
-                    return $this->ErrorResponse(400,$validator->errors()->first());
+                    return $this->ErrorResponse(200,$validator->errors()->first());
                 }
                 $cms = $this->cms->where('type',$request->type)->first();
                 return $this->SuccessResponse(200, 'cms get Successfully',$cms);
             }
-            return $this->ErrorResponse(500, 'Something Went Wrong');
+            return $this->ErrorResponse(200, 'Something Went Wrong');
         } catch (Exception $exception) {
             logger('error occurred in addresses fetching process');
             logger(json_encode($exception));
-            return $this->ErrorResponse(500, 'Something Went Wrong');
+            return $this->ErrorResponse(200, 'Something Went Wrong');
         }
     }
 }

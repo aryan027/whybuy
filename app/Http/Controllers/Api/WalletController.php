@@ -97,7 +97,7 @@ class WalletController extends Controller
         if ($ad['deposit_amount'] == $wallet['balance']) {
             return true;
         }
-        return $this->ErrorResponse('400', 'You don\'t have sufficient balance ');
+        return $this->ErrorResponse(200, 'You don\'t have sufficient balance ');
     }
 
 

@@ -54,7 +54,7 @@ class CategoryController extends Controller
                     'category_id'=>'required|integer|exists:categories,id',
                 ]);
                 if($validator->fails()){
-                    return $this->ErrorResponse(400,$validator->errors()->first());
+                    return $this->ErrorResponse(200,$validator->errors()->first());
                 }
                 $category = Category::with('subCategory','subCategory.media')->where('id', $request->category_id)->first();
                 if(!empty($category)){
@@ -62,9 +62,9 @@ class CategoryController extends Controller
                     unset($category['media']);
                     return $this->SuccessResponse(200, 'Category get successfully',$category);
                 }
-                return $this->ErrorResponse(404, 'Category not found');
+                return $this->ErrorResponse(200, 'Category not found');
             }
-            return $this->ErrorResponse(500, 'Something Went Wrong');
+            return $this->ErrorResponse(200, 'Something Went Wrong');
         } catch (Exception $exception) {
             logger('error occurred in addresses fetching process');
             logger(json_encode($exception));

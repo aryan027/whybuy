@@ -18,10 +18,10 @@ class NotificationController extends Controller
                     'status'=>'required|in:1,2,3,4',
                 ]);
                 if($validator->fails()){
-                    return $this->ErrorResponse(400,$validator->errors()->first());
+                    return $this->ErrorResponse(200,$validator->errors()->first());
                 }
                 $notification = $this->notification::with('getRentItem','getRentItem.ads','getRentItem.ads.media','getSenderUser','getSenderUser.media')->where(['receiver_id' => $user->id,'status' => $request->status])->paginate(20);
-                return  $this->SuccessResponse(200,'Notification Fetched!',$notification);  
+                return  $this->SuccessResponse(200,'Notification Fetched!',$notification);
             }
             return $this->ErrorResponse(401, 'Unauthenticated');
         } catch (Exception $exception) {
@@ -40,16 +40,16 @@ class NotificationController extends Controller
                     'notification_id'=>'required|integer|exists:notification,id',
                 ]);
                 if($validator->fails()){
-                    return $this->ErrorResponse(400,$validator->errors()->first());
+                    return $this->ErrorResponse(200,$validator->errors()->first());
                 }
 
                 $notification = $this->notification::where(['receiver_id' => $user->id,'id' => $request->notification_id])->first();
                 if(!empty($notification)){
                     $notification->is_read = $this->notification::IS_READ;
                     $notification->save();
-                    return  $this->SuccessResponse(200,'Notification read successfully!',$notification);  
+                    return  $this->SuccessResponse(200,'Notification read successfully!',$notification);
                 }
-                return $this->ErrorResponse(404, 'Notification not found');
+                return $this->ErrorResponse(200, 'Notification not found');
             }
             return $this->ErrorResponse(401, 'Unauthenticated');
         } catch (Exception $exception) {
