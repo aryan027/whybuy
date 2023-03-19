@@ -134,7 +134,7 @@ class AdController extends Controller
     }
 
     public function myAds() {
-        $ads = Advertisement::with('subCategory', 'category')->where(['user_id' => auth()->id(),'status' => true, 'approved' => true, 'published' => true])->latest()->get();
+        $ads = Advertisement::with('subCategory', 'category')->where(['user_id' => auth()->id(),'status' => true, 'published' => true])->latest()->get();
         $ads = collect($ads)->map(function($q) {
             $q->seen_count = (count($q->getSeenHistory) > 0) ? $q->getSeenHistory->count() : 0;
             $q->media = ($q->getFirstMediaUrl('ads'));
@@ -268,7 +268,7 @@ class AdController extends Controller
                     'image.*' => 'mimes:jpeg,png,jpg'
                 ]);
                 if ($validator->fails()) {
-                    return $this->ErrorResponse(403, 'Input Validation Failed', $validator->errors());
+                    return $this->ErrorResponse(400,$validator->errors()->first());
                 }
                 $advertisement = Advertisement::where('id',$request->advertisent_id)->where('user_id',$user->id)->first();
                 if(!empty($advertisement)){
@@ -282,7 +282,7 @@ class AdController extends Controller
                             $advertisement->addMedia($image)->toMediaCollection('ads');
                         }
                     }
-                    return $this->SuccessResponse(200, 'Ad Sent for approval', $advertisement);
+                    return $this->SuccessResponse(200, 'Ads updated successfully', $advertisement);
                 }
                 return $this->ErrorResponse(404, 'Advertisement not found');
             }
