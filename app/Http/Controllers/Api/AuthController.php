@@ -71,7 +71,8 @@ class AuthController extends Controller
         $data= Temp_token::where(['token' =>$request->token,'otp'=>$request->otp,'is_login'=>false,'is_expired'=>false])->first();
         $user= User::create([
             'mobile'=>$data->mobile ?? '',
-            'email'=>$data->email ?? ''
+            'email'=>$data->email ?? '',
+            'status'=> 1
         ]);
         $data->delete();
         if(!$user){
@@ -120,13 +121,21 @@ class AuthController extends Controller
         if (!user::where('mobile', $request->mobile)->orWhere('email',$request->email)->exists()) {
             return $this->ErrorResponse(400, 'User does not exists ..! Kindly register ');
         }
-        if (user::where(['mobile'=> $request->mobile])->orWhere('email',$request->email)->where(['status'=> false])->exists()) {
+
+        $getUser = User::where(['status'=> false])->when(function($query) use($request){
+            return $query->where(['mobile'=> $request->mobile]);
+        })->when(function($query) use($request){
+            return $query->Where(['email' => $request->email]);
+        })
+        ->first();
+
+        if (!empty($getUser)) {
             return $this->ErrorResponse(400, 'Your account is disable kindly contact to administrator ..!');
         }
 
 //        $otp = rand(99999, 1000000);
         $otp = '123456';
-        $token = md5($request->mobile ??$request->email . time());
+        $token = md5($request->mobile ?? $request->email).time();
         $send = Temp_token::create([
             'mobile' => $request['mobile']??'',
             'email' => $request['email']??'',
