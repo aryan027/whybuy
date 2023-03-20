@@ -17,6 +17,7 @@ use App\Models\CMS;
 use App\Models\RentalAgreement;
 use App\Models\Notification;
 use App\Models\AdsSeenHistory;
+use App\Models\Package;
 
 class Controller extends BaseController
 {
@@ -35,6 +36,7 @@ class Controller extends BaseController
         $this->rentalAgreement = new RentalAgreement();
         $this->notification = new Notification();
         $this->adsSeenHistory = new AdsSeenHistory();
+        $this->package = new Package();
     }
     public function SuccessResponse($code,$message,$data=null){
 
