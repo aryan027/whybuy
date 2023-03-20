@@ -33,11 +33,11 @@ class UserController extends Controller
      */
     public function create()
     {
-        try {
-            return view('admin.user.create');
-        }catch(Exception $e) {
-            abort(500);
-        }
+        // try {
+        //     return view('admin.user.create');
+        // }catch(Exception $e) {
+        //     abort(500);
+        // }
     }
 
     /**
@@ -45,39 +45,39 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        try {
+        // try {
 
-            $rule = [
-                'fname'=>'required|string',
-                'lname'=>'required|string',
-                'email'=>'required|email|unique:users,email,',
-                'mobile'=>'required|unique:users,mobile,',
-                'dob' =>'required|date_format:Y-m-d|before:today',
-                'gender'=>'required|in:male,female',
-                'password' => 'required',
-                'confirm_password' => 'required_with:password|same:password',
-            ];
-            $valid = Validator::make($request->all(),$rule);
-            if($valid->fails()){
-                return redirect()->back()->withErrors($valid->errors())->withInput();
-            }
-            $user = $this->user;
-            $user->fname = $request->fname;
-            $user->lname = $request->lname;
-            $user->email = $request->email;
-            $user->mobile = $request->mobile;
-            $user->dob = $request->dob;
-            $user->gender = $request->gender;
-            $user->password = Hash::make($request->password);
-            $user->status = $request->status;
-            $user->save();
-            if($request->hasFile('profile_picture') && $request->file('profile_picture')->isValid()){
-                $user->addMediaFromRequest('profile_picture')->toMediaCollection('profile_picture');
-            }
-            return redirect(route('user.index'))->with('success','User added Successfully');
-        }catch(Exception $e) {
-            abort(500);
-        }
+        //     $rule = [
+        //         'fname'=>'required|string',
+        //         'lname'=>'required|string',
+        //         'email'=>'required|email|unique:users,email,',
+        //         'mobile'=>'required|unique:users,mobile,',
+        //         'dob' =>'required|date_format:Y-m-d|before:today',
+        //         'gender'=>'required|in:male,female',
+        //         'password' => 'required',
+        //         'confirm_password' => 'required_with:password|same:password',
+        //     ];
+        //     $valid = Validator::make($request->all(),$rule);
+        //     if($valid->fails()){
+        //         return redirect()->back()->withErrors($valid->errors())->withInput();
+        //     }
+        //     $user = $this->user;
+        //     $user->fname = $request->fname;
+        //     $user->lname = $request->lname;
+        //     $user->email = $request->email;
+        //     $user->mobile = $request->mobile;
+        //     $user->dob = $request->dob;
+        //     $user->gender = $request->gender;
+        //     $user->password = Hash::make($request->password);
+        //     $user->status = $request->status;
+        //     $user->save();
+        //     if($request->hasFile('profile_picture') && $request->file('profile_picture')->isValid()){
+        //         $user->addMediaFromRequest('profile_picture')->toMediaCollection('profile_picture');
+        //     }
+        //     return redirect(route('user.index'))->with('success','User added Successfully');
+        // }catch(Exception $e) {
+        //     abort(500);
+        // }
     }
 
     /**
@@ -93,16 +93,16 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
-        try {
-            $id = decrypt($id);
-            $user = $this->user->where('id',$id)->first();
-            if(!empty($user)){
-                return view('admin.user.edit',compact('user'));
-            }
-            return redirect()->back()->with('error','Something went to wrong!');
-        }catch(Exception $e) {
-            abort(500);
-        }
+        // try {
+        //     $id = decrypt($id);
+        //     $user = $this->user->where('id',$id)->first();
+        //     if(!empty($user)){
+        //         return view('admin.user.edit',compact('user'));
+        //     }
+        //     return redirect()->back()->with('error','Something went to wrong!');
+        // }catch(Exception $e) {
+        //     abort(500);
+        // }
     }
 
     /**
@@ -126,21 +126,21 @@ class UserController extends Controller
      */
     public function userStatus(Request $request,string $id)
     {
-        try {
-            if($request->ajax()){
-                $id = decrypt($id);
-                $user = $this->user->where('id',$id)->first();
-                $data['status'] = 0;
-                if(!empty($user)){
-                    $user->status = ($user->status == 0) ? 1 : 0;
-                    $user->save();
-                    $data['status'] = 1;
-                }
-                return $data;
-            }
-        }catch(Exception $e) {
-            abort(500);
-        }
+        // try {
+        //     if($request->ajax()){
+        //         $id = decrypt($id);
+        //         $user = $this->user->where('id',$id)->first();
+        //         $data['status'] = 0;
+        //         if(!empty($user)){
+        //             $user->status = ($user->status == 0) ? 1 : 0;
+        //             $user->save();
+        //             $data['status'] = 1;
+        //         }
+        //         return $data;
+        //     }
+        // }catch(Exception $e) {
+        //     abort(500);
+        // }
     }
 
     

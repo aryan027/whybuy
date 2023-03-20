@@ -10,7 +10,9 @@ use App\Http\Controllers\Admin\AdvertisementController;
 use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\CMSController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\SubscriptionController;
 use App\Http\Controllers\AgreementController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -67,5 +69,7 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('user', UserController::class);
         Route::put('user-status/{id}', [UserController::class,'userStatus'])->name('user.status');      
 
+        // Subscription module
+        Route::resource('package', SubscriptionController::class);
     });
 });

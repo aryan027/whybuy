@@ -70,6 +70,12 @@
                         <span>Users</span>
                     </a>
                 </li>
+                <li class="sidebar-item {{ Request::segment(2) === 'package' ? 'active' : '' }}">
+                    <a href="{{route('package.index')}}" class='sidebar-link'>
+                        <i class="bi bi-box"></i>
+                        <span>Subscription Plan</span>
+                    </a>
+                </li>
             </ul>
         </div>
     </div>
