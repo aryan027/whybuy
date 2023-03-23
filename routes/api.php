@@ -54,6 +54,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post('advertisement-detail', [AdController::class, 'AdvertisementDetail']);
         Route::post('owner-profile', [AdController::class, 'ownerProfile']);
         Route::post('/by/subcategory', [AdController::class, 'AdvertisementBySub']);
+        Route::get('recent-search', [AdController::class, 'recentSearch']);
+        Route::get('trending', [AdController::class, 'trending']);
     });
 });
 
@@ -108,6 +110,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     // Users Details
     Route::group(['prefix' => 'users'], function () {
+        Route::post('update-password', [UserController::class, 'updatePassword']);
         Route::get('user-detail', [UserController::class, 'userDetail']);
         Route::post('update-profile', [UserController::class, 'updateProfile']);
         Route::post('update-profile-picture', [UserController::class, 'updateProfilePicture']);

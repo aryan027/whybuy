@@ -9,9 +9,12 @@ use App\Models\SubCategory;
 use App\Models\AdsSeenHistory;
 use App\Models\User;
 use App\Models\FavouriteAds;
+use App\Models\RecentSearchAds;
+use App\Models\RentItem;
 use Haruncpi\LaravelIdGenerator\IdGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 class AdController extends Controller
 {
@@ -115,9 +118,12 @@ class AdController extends Controller
                 }
 
                 $ads = $ads->latest()->paginate(20);
-                $ads->map(function($q){
+                $ads->map(function($q) use($search,$category,$subCategory,$start_budget,$end_budget,$latitude,$longitude,$user){
                     $q->seen_count = (count($q->getSeenHistory) > 0) ? $q->getSeenHistory->count() : 0;
                     unset($q->getSeenHistory);
+                    if($search !='' || $category !='' || $subCategory !='' || ($start_budget !=''  && $end_budget !='') || ($latitude !='' && $longitude !='')){
+                        $this->resentSearchStore($q->id,$user->id);
+                    }
                 });
                 // $ads = collect($ads)->map(function($q) {
                 //     $q->media = ($q->getFirstMediaUrl('ads'));
@@ -131,6 +137,19 @@ class AdController extends Controller
             logger(json_encode($exception));
             return $this->ErrorResponse(500, 'Something Went Wrong');
         }
+    }
+
+    public function resentSearchStore($adsId,$userId)
+    {
+        $getRecentAds =  RecentSearchAds::where(['user_id' => $userId, 'ad_id' => $adsId])->first();
+        $recentSearchAds = new RecentSearchAds;
+        if(!empty($getRecentAds)){
+            $recentSearchAds = $getRecentAds;
+        }
+        $recentSearchAds->user_id = $userId;
+        $recentSearchAds->ad_id = $adsId;
+        $recentSearchAds->updated_at = Carbon::now();
+        $recentSearchAds->save();
     }
 
     public function myAds() {
@@ -195,7 +214,8 @@ class AdController extends Controller
                     $advertisement->seen_count = (count($advertisement->getSeenHistory) > 0) ? $advertisement->getSeenHistory->count() : 0;
                     $advertisement->favorite = $favotiteAds;
                     $advertisement->media = $advertisement->getFirstMediaUrl('ads');
-
+                    $getSimilarProduct  = Advertisement::with('media')->where('sub_category',$advertisement->sub_category)->where('id','!=',$advertisement->id)->orderBy('id','DESC')->limit(10)->get();
+                    $advertisement->similar_product = $getSimilarProduct;
                     $adsSeenHistory = AdsSeenHistory::where(['user_id' => $user->id,'ads_id' => $advertisement->id])->first();
                     if(empty($adsSeenHistory)){
                         $this->addAdsHistory($user,$advertisement->id);
@@ -305,10 +325,10 @@ class AdController extends Controller
                     return $this->ErrorResponse(200,$validator->errors()->first());
                 }
                 $ads = Advertisement::with('subCategory', 'category')->where(['sub_category' => $request['sub_category'],'status' => true, 'approved' => true, 'published' => true])->get()->paginate(20);
-//                $ads = collect($ads)->map(function($q) {
-//                    $q->media = ($q->getFirstMediaUrl('ads'));
-//                    return $q;
-//                });
+                //  $ads = collect($ads)->map(function($q) {
+                //                    $q->media = ($q->getFirstMediaUrl('ads'));
+                //                    return $q;
+                //                });
                 return $this->SuccessResponse(200, 'Advertisement Fetched Successfully', $ads);
             }
             return $this->ErrorResponse(500, 'Something Went Wrong');
@@ -326,4 +346,44 @@ class AdController extends Controller
        $adsSeenHistory->ads_id = $advertisementId;
        $adsSeenHistory->save();
     }
+
+    // Recent Search
+    public function recentSearch(Request $request)
+    {
+        try {
+            $user = auth()->user();
+            if(!empty($user)){
+                $getRecentAds =  RecentSearchAds::with('recentSearchAds','recentSearchAds.media')->where(['user_id' => $user->id])->paginate(20);
+                return $this->SuccessResponse(200, 'Advertisement Fetched Successfully', $getRecentAds);
+            }
+            return $this->ErrorResponse(401, 'Unauthorized');
+        } catch (Exception $exception) {
+            logger('error occurred in ads fetching process');
+            logger(json_encode($exception));
+            return $this->ErrorResponse(500, 'Something Went Wrong');
+        }
+    }
+
+    // Trending
+    public function trending(Request $request)
+    {
+        try {
+            $user = auth()->user();
+            if(!empty($user)){
+                $trending =  RentItem::select(\DB::raw('count(id) as total,ads_id'))
+                ->with(
+                ['ads' => function($q){
+                    $q->select('id','sub_category');
+                },'ads.getSubCategory.media'])
+                ->orderBy('total','DESC')->groupBy('ads_id')->paginate(20);
+                return $this->SuccessResponse(200, 'Tranding Fetched Successfully', $trending);
+            }
+            return $this->ErrorResponse(401, 'Unauthorized');
+        } catch (Exception $exception) {
+            logger('error occurred in ads fetching process');
+            logger(json_encode($exception));
+            return $this->ErrorResponse(500, 'Something Went Wrong');
+        }
+    }
+    
 }
