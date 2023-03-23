@@ -353,7 +353,7 @@ class AdController extends Controller
         try {
             $user = auth()->user();
             if(!empty($user)){
-                $getRecentAds =  RecentSearchAds::with('recentSearchAds','recentSearchAds.media')->where(['user_id' => $user->id])->paginate(20);
+                $getRecentAds =  RecentSearchAds::with('recentSearchAds','recentSearchAds.media')->where(['user_id' => $user->id])->orderBy('updated_at','DESC')->paginate(20);
                 return $this->SuccessResponse(200, 'Advertisement Fetched Successfully', $getRecentAds);
             }
             return $this->ErrorResponse(401, 'Unauthorized');
