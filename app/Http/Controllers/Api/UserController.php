@@ -293,4 +293,34 @@ class UserController extends Controller
         }
     }
 
+       // Update Password
+       public function updatePassword(Request $request)
+       {
+           try {
+               $user = auth()->user();
+               if(!empty($user)){
+                   $validator= Validator::make($request->all(),[
+                       'old_password' => 'required',
+                       'new_password'=>'required',
+                       'confirm_password'=>'required|same:new_password',
+                   ]);
+                    if($validator->fails()){
+                        return $this->ErrorResponse(200,$validator->errors()->first());
+                    }
+                    if(!Hash::check($request->old_password, $user->password)){
+                        return $this->ErrorResponse(200, "Old Password Doesn't match!");
+                    }
+                    $user->password = Hash::make($request->new_password);
+                    $user->save();
+                   return $this->SuccessResponse(200, 'Password updated successfully');
+               }
+               return $this->ErrorResponse(401, 'Unauthenticated');
+           } catch (Exception $exception) {
+               logger('error occurred in addresses fetching process');
+               logger(json_encode($exception));
+               return $this->ErrorResponse(500, 'Something Went Wrong');
+           }
+       }
+    
+
 }
