@@ -121,7 +121,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get('get-address', [UserController::class, 'getAddress']);
         Route::post('get-address-detail', [UserController::class, 'getAddressDetail']);
         Route::post('update-address', [UserController::class, 'updateAddress']);
-        Route::delete('delete-address', [UserController::class, 'deleteAddress']);
+        Route::post('delete-address', [UserController::class, 'deleteAddress']);
 
         Route::post('user-report', [UserController::class, 'userReport']);
 
