@@ -44,13 +44,8 @@ class ReviewController extends Controller
         return $this->SuccessResponse(200,'Data fetch successfully ..!',$list);
     }
     public function review_user_list(Request $request){
-        $validator = Validator::make($request->all(), [
-            'ad_id'=>'required',
-        ]);
-        if ($validator->fails()) {
-            return $this->ErrorResponse(200,$validator->errors()->first());
-        }
-        $list= Review::with('ads')->where(['ad_id'=>$request->ad_id,'user_id'=>auth()->id()])->get();
+
+        $list= Review::with('ads')->where(['user_id'=>auth()->id()])->get();
         return $this->SuccessResponse(200,'Data fetch successfully ..!',$list);
     }
 
