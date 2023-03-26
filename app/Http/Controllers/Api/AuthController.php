@@ -286,7 +286,7 @@ class AuthController extends Controller
             return $this->ErrorResponse(200,'User not found ..!');
         }
         $otpData->delete();
-        $user['token'] = 'Bearer ' . $user->createToken('forget_password')->plainTextToken;
+        $user['token'] = 'Bearer ' . $user->createToken('auth_token')->plainTextToken;
         return  $this->SuccessResponse(200,'Otp verify successfully ..!',$user);
     }
 
