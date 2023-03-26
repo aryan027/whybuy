@@ -135,7 +135,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get('get-cms', [CMSController::class, 'cms']);
     });
 
-    // Notification Modules
+    Route::group(['prefix' => 'forget'], function () {
+        Route::post('/password/create',[AuthController::class,'password_create']);
+    });
 
     Route::group(['prefix' => 'notification'], function () {
         // CMS
