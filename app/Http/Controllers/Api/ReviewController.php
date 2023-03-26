@@ -64,7 +64,7 @@ class ReviewController extends Controller
         if ($validator->fails()) {
             return $this->ErrorResponse(200,$validator->errors()->first());
         }
-        if(Review::where('id',$request['id'])->exists()){
+        if(!Review::where('id',$request['id'])->exists()){
             return $this->ErrorResponse(200,'Invalid review Id ..!');
         }
 
