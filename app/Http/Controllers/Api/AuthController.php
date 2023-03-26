@@ -282,7 +282,7 @@ class AuthController extends Controller
         }
 
         $user = User::find($otpData->user_id);
-        if (!$user) {
+        if (!User::where('id',$otpData->user_id)->exists()) {
             return $this->ErrorResponse(200,'User not found ..!');
         }
         $otpData->delete();
