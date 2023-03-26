@@ -182,7 +182,6 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return $this->ErrorResponse(200, $validator->errors()->messages());
         }
-        dd(auth()->id());
         $user = User::find(auth()->id());
         if (!User::where('id',auth()->id())->exists()) {
             return $this->ErrorResponse(200,'User not found ..!');
