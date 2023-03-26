@@ -281,8 +281,8 @@ class AuthController extends Controller
             return $this->ErrorResponse(200,'Invalid otp ..!');
         }
 
-        $user = User::find(auth()->id());
-        if (!User::where('id',auth()->id())->exists()) {
+        $user = User::find($otpData->user_id);
+        if (!User::where('id',$otpData->user_id)->exists()) {
             return $this->ErrorResponse(200,'User not found ..!');
         }
         $otpData->delete();
