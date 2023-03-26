@@ -183,7 +183,7 @@ class AuthController extends Controller
             return $this->ErrorResponse(200, $validator->errors()->messages());
         }
         $user = User::find(auth()->id());
-        if (!$user) {
+        if (!User::where('id',auth()->id())->exists()) {
             return $this->ErrorResponse(200,'User not found ..!');
         }
         $user->update([
