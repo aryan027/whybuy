@@ -68,7 +68,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     });
     Route::post('review',[\App\Http\Controllers\Api\ReviewController::class,'review']);
-    Route::post('review/edit',[\App\Http\Controllers\Api\ReviewController::class,'review']);
+    Route::post('review/edit',[\App\Http\Controllers\Api\ReviewController::class,'review_edit']);
     Route::post('review/list',[\App\Http\Controllers\Api\ReviewController::class,'review_list']);
     Route::post('review/list/user',[\App\Http\Controllers\Api\ReviewController::class,'review_user_list']);
 
