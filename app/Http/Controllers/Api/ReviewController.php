@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 
 class ReviewController extends Controller
 {
-    public function reveiw(Request $request)
+    public function review(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'ad_id'=>'required',
