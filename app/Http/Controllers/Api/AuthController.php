@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\OTP;
 use App\Models\Temp_token;
 use App\Models\User;
 use Carbon\Carbon;
@@ -182,6 +183,9 @@ class AuthController extends Controller
             return $this->ErrorResponse(200, $validator->errors()->messages());
         }
         $user = User::find(auth()->id());
+        if (!$user) {
+            return $this->ErrorResponse(200,'User not found ..!');
+        }
         $user->update([
             'password'=> Hash::make($request->password)
         ]);
@@ -220,6 +224,70 @@ class AuthController extends Controller
             return $this->ErrorResponse(200, 'Something went wrong. Please try again after sometime');
         }
         return $this->SuccessResponse(200, 'Otp has been sent to your register email id', array('token' => $send->token));
+    }
+
+    public function forget_password(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'identifier'=>'required'
+        ],['identifier.required'=>"please enter you register Email or mobile no"]);
+        if ($validator->fails()) {
+            return $this->ErrorResponse(200, $validator->errors()->messages());
+        }
+
+        $user = User::where('email', $request->identifier)
+            ->orWhere('mobile', $request->identifier)
+            ->first();
+        if (!$user) {
+            return $this->ErrorResponse(200,'User not found ..!');
+        }
+
+//        $otp = mt_rand(100000, 999999);
+        $otp = '654321';
+        $token= md5($request->identifier . time());
+
+        if ($user->email === $request->identifier) {
+            $data = ['otp' => $otp];
+//            Mail::to($user->email)->send(new ForgotPasswordMail($data));
+        } else {
+
+            // Replace the placeholder with your SMS API code
+//            $smsApi->send($user->mobile, "Your OTP is $otp");
+        }
+
+        $otpData = [
+            'user_id' => $user->id,
+            'identifier' => $request->identifier,
+            'otp' => $otp,
+            'token'=>$token
+        ];
+        OTP::create($otpData);
+    return $this->SuccessResponse(200,'Otp sent your register email/mobile no',$token);
+
+    }
+
+    public function verify(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'otp'=>'required',
+            'token' =>'required'
+        ]);
+        if ($validator->fails()) {
+            return $this->ErrorResponse(200, $validator->errors()->first());
+        }
+
+        $otpData = Otp::where(['otp'=> $request->otp,'token'=>$request->token])->latest()->first();
+        if (!$otpData || $otpData->otp !== $request->otp) {
+            return $this->ErrorResponse(200,'Invalid otp ..!');
+        }
+
+        $user = User::find($otpData->user_id);
+        if (!$user) {
+            return $this->ErrorResponse(200,'User not found ..!');
+        }
+        $otpData->delete();
+        $user['token'] = 'Bearer ' . $user->createToken('forget_password')->plainTextToken;
+        return  $this->SuccessResponse(200,'Otp verify successfully ..!',$user);
     }
 
 

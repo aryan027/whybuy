@@ -136,6 +136,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
 
     // Notification Modules
+    Route::group(['prefix' => 'forget'], function () {
+        Route::post('/password',[AuthController::class,'forget_password']);
+        Route::post('/verify',[AuthController::class,'verify']);
+        Route::post('/password/create',[AuthController::class,'password_create']);
+    });
     Route::group(['prefix' => 'notification'], function () {
         // CMS
         Route::get('/', [NotificationController::class, 'index']);
