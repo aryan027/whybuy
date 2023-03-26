@@ -13,8 +13,8 @@ class ReviewController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'ad_id'=>'required',
-            'rating' => 'required|integer|between:1,5',
-            'review' => 'required|string|max:255',
+            'rating' => 'required_without:review|integer|between:1,5',
+            'review' => 'required_without:rating|string|max:255',
         ]);
         if ($validator->fails()) {
             return $this->ErrorResponse(200,$validator->errors()->first());
