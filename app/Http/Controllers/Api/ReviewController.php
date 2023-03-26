@@ -68,7 +68,7 @@ class ReviewController extends Controller
             return $this->ErrorResponse(200,'Invalid review Id ..!');
         }
 
-        $review= Review::where('id',$request['id'])->get()->frist();
+        $review= Review::where('id',$request['id'])->get()->first();
         $review->rating= $request->rating;
         $review->review= $request->review;
         $review->save();
