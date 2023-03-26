@@ -26,7 +26,7 @@ class ReviewController extends Controller
         $review = Review::create([
             'user_id'=>auth()->id(),
             'rating'=>$request['rating'],
-            'comment'=>$request['comment'],
+            'review'=>$request['review'],
             'ad_id'=>$request['ad_id']
         ]);
         return $this->SuccessResponse(200,'Review given successfully ..!',$review);
@@ -52,5 +52,27 @@ class ReviewController extends Controller
         }
         $list= Review::with('ads')->where(['ad_id'=>$request->ad_id,'user_id'=>auth()->id()])->get();
         return $this->SuccessResponse(200,'Data fetch successfully ..!',$list);
+    }
+
+    public function review_edit(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id'=>'required',
+            'rating' => 'required_without:review|integer|between:1,5',
+            'review' => 'required_without:rating|string|max:255',
+        ]);
+        if ($validator->fails()) {
+            return $this->ErrorResponse(200,$validator->errors()->first());
+        }
+        if(Review::where('id',$request['id'])->exists()){
+            return $this->ErrorResponse(200,'Invalid review Id ..!');
+        }
+
+        $review= new Review;
+        $review->rating= $request->rating;
+        $review->review= $request->review;
+        $review->save();
+        return $this->SuccessResponse(200,'Review updated successfully ..!',$review);
+
     }
 }
