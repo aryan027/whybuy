@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('packages', function (Blueprint $table) {
-            $table->integer('durations');
-            $table->longText('description')->nullable();
-            $table->enum('type',['free','paid']);
+        Schema::table('users', function (Blueprint $table) {
+            $table->tinyInteger('whatsapp_message')->default(0)->after('last_login')->comment("Whatsapp message on of");
         });
     }
 
@@ -23,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('packages', function (Blueprint $table) {
+        Schema::table('users', function (Blueprint $table) {
             //
         });
     }

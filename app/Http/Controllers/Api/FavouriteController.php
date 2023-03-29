@@ -16,19 +16,27 @@ class FavouriteController extends Controller
             if(!empty($user)){
                 $validator= Validator::make($request->all(),[
                     'ads_id'=> 'required|integer|exists:advertisements,id',
+                    'is_favorite'=> 'required|integer|in:0,1',
                 ]);
                 if($validator->fails()){
                     return $this->ErrorResponse(200,$validator->errors()->first());
                 }
                 $getFevorite = FavouriteAds::where('ads_id',$request->ads_id)->where('user_id',$user->id)->first();
-                if(!empty($getFevorite)){
-                    return $this->ErrorResponse(200, 'You have already favorite this advertisement');
+                if($request->is_favorite == 0){
+                    if(!empty($getFevorite)){
+                        $getFevorite->delete();
+                    }
+                    return $this->SuccessResponse(200,'Unfavorite');
+                }else{
+                    $favourite = $getFevorite;
+                    if(empty($getFevorite)){
+                        $favourite = FavouriteAds::create([
+                            'ads_id'=>$request->ads_id,
+                            'user_id'=>$user->id
+                        ]);
+                    }
+                    return $this->SuccessResponse(200,'favourite',$favourite);
                 }
-                $favourite = FavouriteAds::create([
-                    'ads_id'=>$request->ads_id,
-                    'user_id'=>$user->id
-                ]);
-                return $this->SuccessResponse(200,'Added to favourite successfully',$favourite);
             }
             return $this->ErrorResponse(200, 'Unauthenticated');
         } catch (Exception $exception) {

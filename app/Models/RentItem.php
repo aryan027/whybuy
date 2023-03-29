@@ -22,4 +22,8 @@ class RentItem extends Model
         return $this->belongsTo(User::class,'owner_id');
     }
 
+    public function rentAddress(){
+        return $this->belongsTo(Addresses::class,'address_id');
+    }
+
 }

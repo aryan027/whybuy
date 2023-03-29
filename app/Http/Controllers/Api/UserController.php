@@ -5,6 +5,8 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Countries;
+use App\Models\UserReport;
 use Exception;
 use Hash;
 
@@ -107,6 +109,8 @@ class UserController extends Controller
                     'city'=>'required',
                     'state'=>'required',
                     'country_id'=>'required|exists:countries,id',
+                    'latitude' => 'required',
+                    'longitude' => 'required',
                 ]);
                 if($validator->fails()){
                     return $this->ErrorResponse(400,$validator->errors()->first());
@@ -185,6 +189,8 @@ class UserController extends Controller
                     'city'=>'required',
                     'state'=>'required',
                     'country_id'=>'required|exists:countries,id',
+                    'latitude' => 'required',
+                    'longitude' => 'required',
                 ]);
                 if($validator->fails()){
                     return $this->ErrorResponse(200,$validator->errors()->first());
@@ -246,14 +252,22 @@ class UserController extends Controller
             if(!empty($user)){
                 $validator= Validator::make($request->all(),[
                     'report_type'=>'required',
+                    'owner_id' => 'required|exists:users,id'
                 ]);
                 if($validator->fails()){
                     return $this->ErrorResponse(200,$validator->errors()->first());
                 }
-                $user->report_type = $request->report_type;
-                $user->report_comment = $request->report_comment;
-                $user->save();
-                return $this->SuccessResponse(200, 'Report added successfully',$user);
+                $userReport = new UserReport;
+                $getUserReport = UserReport::where(['user_id' => $user->id,'owner_id' => $request->owner_id])->first();
+                if(!empty($getUserReport)){
+                    $userReport = $getUserReport;
+                }
+                $userReport->user_id = $user->id;
+                $userReport->owner_id = $request->owner_id;
+                $userReport->report = $request->report_type;
+                $userReport->comment = $request->report_comment;
+                $userReport->save();
+                return $this->SuccessResponse(200, 'Report added successfully',$userReport);
             }
             return $this->ErrorResponse(500, 'Something Went Wrong');
         } catch (Exception $exception) {
@@ -269,8 +283,9 @@ class UserController extends Controller
         try {
             $user = auth()->user();
             if(!empty($user)){
+                $user->status = 0;
+                $user->save();
                 auth()->user()->tokens()->delete();
-                $user->delete();
                 return $this->SuccessResponse(200, 'Account has been deleted');
             }
             return $this->ErrorResponse(500, 'Something Went Wrong');
@@ -307,34 +322,75 @@ class UserController extends Controller
         }
     }
 
-       // Update Password
-       public function updatePassword(Request $request)
-       {
-           try {
-               $user = auth()->user();
-               if(!empty($user)){
-                   $validator= Validator::make($request->all(),[
-                       'old_password' => 'required',
-                       'new_password'=>'required',
-                       'confirm_password'=>'required|same:new_password',
-                   ]);
-                    if($validator->fails()){
-                        return $this->ErrorResponse(200,$validator->errors()->first());
-                    }
-                    if(!Hash::check($request->old_password, $user->password)){
-                        return $this->ErrorResponse(200, "Old Password Doesn't match!");
-                    }
-                    $user->password = Hash::make($request->new_password);
-                    $user->save();
-                   return $this->SuccessResponse(200, 'Password updated successfully');
-               }
-               return $this->ErrorResponse(401, 'Unauthenticated');
-           } catch (Exception $exception) {
-               logger('error occurred in addresses fetching process');
-               logger(json_encode($exception));
-               return $this->ErrorResponse(500, 'Something Went Wrong');
-           }
-       }
+    // Update Password
+    public function updatePassword(Request $request)
+    {
+        try {
+            $user = auth()->user();
+            if(!empty($user)){
+                $validator= Validator::make($request->all(),[
+                    'old_password' => 'required',
+                    'new_password'=>'required',
+                    'confirm_password'=>'required|same:new_password',
+                ]);
+                if($validator->fails()){
+                    return $this->ErrorResponse(200,$validator->errors()->first());
+                }
+                if(!Hash::check($request->old_password, $user->password)){
+                    return $this->ErrorResponse(200, "Old Password Doesn't match!");
+                }
+                $user->password = Hash::make($request->new_password);
+                $user->save();
+                return $this->SuccessResponse(200, 'Password updated successfully');
+            }
+            return $this->ErrorResponse(401, 'Unauthenticated');
+        } catch (Exception $exception) {
+            logger('error occurred in addresses fetching process');
+            logger(json_encode($exception));
+            return $this->ErrorResponse(500, 'Something Went Wrong');
+        }
+    }
+
+    // Country List
+    public function countryList(Request $request)
+    {
+        try {
+            $user = auth()->user();
+            if(!empty($user)){
+                $countries = Countries::where('status',1)->get();
+                return $this->SuccessResponse(200, 'Country fetched successfully',$countries);
+            }
+            return $this->ErrorResponse(401, 'Unauthenticated');
+        } catch (Exception $exception) {
+            logger('error occurred in addresses fetching process');
+            logger(json_encode($exception));
+            return $this->ErrorResponse(500, 'Something Went Wrong');
+        }
+    }
+
+     // Whats app Message On off
+     public function whatsappMessage(Request $request)
+     {
+         try {
+             $user = auth()->user();
+             if(!empty($user)){
+                $validator= Validator::make($request->all(),[
+                    'type' => 'required|integer|in:0,1',
+                ]);
+                if($validator->fails()){
+                    return $this->ErrorResponse(200,$validator->errors()->first());
+                }
+                $user->whatsapp_message = $request->type;
+                $user->save();
+                return $this->SuccessResponse(200, 'Saved successfully',$user);
+             }
+             return $this->ErrorResponse(401, 'Unauthenticated');
+         } catch (Exception $exception) {
+             logger('error occurred in addresses fetching process');
+             logger(json_encode($exception));
+             return $this->ErrorResponse(500, 'Something Went Wrong');
+         }
+     }
     
 
 }

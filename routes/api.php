@@ -64,7 +64,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post('/create', [AdController::class, 'createAdvertisement']);
         Route::post('/update', [AdController::class, 'updateAdvertisement']);
         Route::get('/', [AdController::class, 'myAds']);
-        Route::post('/published', [AdController::class, 'published']);
+        Route::post('delete-ads', [AdController::class, 'deleteAds']);
 
     });
     Route::post('review',[\App\Http\Controllers\Api\ReviewController::class,'review']);
@@ -92,6 +92,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
        Route::post('/item/user-confirm-agreement',[RentItemController::class,'userConfirmAgreement']);
        Route::post('/item/invoice',[RentItemController::class,'invoice']);
        Route::post('/item/cancel-item',[RentItemController::class,'cancelItem']);
+       Route::get('/item/given-taken',[RentItemController::class,'givenTaken']);
 
     });
     Route::get('packages',[PackageController::class,'package_listing']);
@@ -127,6 +128,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post('user-report', [UserController::class, 'userReport']);
 
         Route::delete('delete-account', [UserController::class, 'deleteAccount']);
+        Route::get('country-list', [UserController::class, 'countryList']);
+        Route::post('whatsapp-message', [UserController::class, 'whatsappMessage']);
     });
 
     // CMS Modules
