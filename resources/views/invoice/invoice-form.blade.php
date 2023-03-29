@@ -87,7 +87,7 @@
     <div class="w-50 float-left mt-10">
         <p class="m-0 pt-5">Invoice Renter</p>
         <p class="m-0 pt-5 text-bold use-name">{{!empty($rentItem->users) ? $rentItem->users->full_name : ''}}</p>
-        <p class="m-0 pt-5">{{!empty($rentItem->ads) ? $rentItem->ads->address : ''}}</p>
+        <p class="m-0 pt-5">{{!empty($rentItem->rentAddress) ? $rentItem->rentAddress->address : ''}}</p>
         <p class="m-0 pt-5 text-bold">{{!empty($rentItem->users) ? $rentItem->users->mobile : ''}}</p>
     </div>
     <div style="clear: both;"></div>
@@ -136,7 +136,7 @@
     <div class="w-50 float-left mt-10">
         <p class="m-0 pt-5">Invoice Owner</p>
         <p class="m-0 pt-5 text-bold use-name">{{!empty($rentItem->owners) ? $rentItem->owners->full_name : ''}}</p>
-        <p class="m-0 pt-5">{{!empty($rentItem->ads) ? $rentItem->ads->address : ''}}</p>
+        <p class="m-0 pt-5">{{!empty($rentItem->rentAddress) ? $rentItem->rentAddress->address : ''}}</p>
         <p class="m-0 pt-5 text-bold">{{!empty($rentItem->owners) ? $rentItem->owners->mobile : ''}}</p>
     </div>
     <div style="clear: both;"></div>

@@ -275,7 +275,7 @@ class RentItemController extends Controller
                     }
                     return  $this->SuccessResponse(200,'Rental agreement accepted.');
                 }
-               return $this->ErrorResponse(200, 'Invalid rent form');
+               return $this->ErrorResponse(200, 'Invalid rent');
             }
             return $this->ErrorResponse(401, 'Unauthenticated');
         } catch (Exception $exception) {
