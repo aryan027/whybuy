@@ -75,7 +75,7 @@ class ChatController extends Controller
         return $this->SuccessResponse(200, 'message sent successfully', $message);
     }
 
-    public function ChatList() {
+    public function adChatList() {
         $chats = ChatInteractions::with('ownerInfo', 'userInfo', 'chats')->where(['status' => true])->get();
         return $this->SuccessResponse(200, 'fetched successfully', $chats);
     }
