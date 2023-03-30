@@ -53,7 +53,7 @@ class ChatController extends Controller
             'content' => $request['message'] ?? null,
             'chat_id' => $cid
         );
-        if ($init['owner_id'] !== auth()->id()) {
+        if ($init['owner_id'] != auth()->id()) {
             $data['sent_by_owner'] = false;
         } else {
             $data['sent_by_owner'] = true;
@@ -75,18 +75,8 @@ class ChatController extends Controller
         return $this->SuccessResponse(200, 'message sent successfully', $message);
     }
 
-    public function adChatList(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'aid' => 'required',
-        ]);
-        if ($validator->fails()) {
-            return $this->ErrorResponse(200, $validator->all());
-        }
-        $advertisement = Advertisement::find($request->aid);
-        if (!$advertisement) {
-            return $this->ErrorResponse(200, 'Advertisement not found');
-        }
-        $chats = ChatInteractions::with('ownerInfo', 'userInfo', 'chats')->where(['owner_id' => $advertisement['user_id'], 'advertisement_id' => $advertisement['id'], 'status' => true])->get();
+    public function ChatList() {
+        $chats = ChatInteractions::with('ownerInfo', 'userInfo', 'chats')->where(['status' => true])->get();
         return $this->SuccessResponse(200, 'fetched successfully', $chats);
     }
 
@@ -103,7 +93,6 @@ class ChatController extends Controller
     }
 
     public function deleteAllChat(Request $request) {
-
         $chatIds = $request->input('chatIds');
         if (empty($userIds)) {
             return $this->ErrorResponse(200,'No Chat ids provide');
