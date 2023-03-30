@@ -151,7 +151,7 @@ class AdController extends Controller
     }
 
     public function myAds() {
-        $ads = Advertisement::with('subCategory', 'category','address','review_rating')->where(['user_id' => auth()->id(),'status' => true, 'published' => true])->latest()->get();
+        $ads = Advertisement::with('subCategory', 'category','address','getReview')->where(['user_id' => auth()->id(),'status' => true, 'published' => true])->latest()->get();
         $ads = collect($ads)->map(function($q) {
             $q->seen_count = (count($q->getSeenHistory) > 0) ? $q->getSeenHistory->count() : 0;
             $q->media = ($q->getFirstMediaUrl('ads'));
