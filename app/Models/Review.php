@@ -19,4 +19,8 @@ class Review extends Model
     {
         return $this->belongsTo(Advertisement::class,'ad_id');
     }
+
+    public function rent(){
+        return $this->belongsTo(RentItem::class,'rent_id');
+    }
 }

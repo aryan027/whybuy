@@ -19,6 +19,7 @@ return new class extends Migration
             $table->boolean('is_media')->default(false);
             $table->string('media_url')->nullable();
             $table->string('content')->nullable();
+            $table->boolean('is_read')->default(false);
             $table->timestamps();
         });
     }

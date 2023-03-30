@@ -10,39 +10,39 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use PhpParser\Node\Stmt\Return_;
 
 class AuthController extends Controller
 {
     public function register(Request $request){
         $validator = Validator::make($request->all(), [
-            'mobile' => 'required|digits:10'
+            'type' => 'required|integer|between:1,3'
         ]);
         if ($validator->fails()) {
             return $this->ErrorResponse(200, $validator->errors()->first());
         }
-        if (user::where('mobile', $request->mobile)->exists()) {
-            return $this->ErrorResponse(200, 'User already exists ..! Kindly login');
+        if($request["type"]== 1){
+            $validator = Validator::make($request->all(), [
+                'value' => 'required|digits:10'
+            ],['value.required'=>'mobile no required']
+            );
+            if ($validator->fails()) {
+                return $this->ErrorResponse(200, $validator->errors()->first());
+            }
+           return  $this->send_otp($request['value'],$request['type']);
         }
-        $verified = Temp_token::where('mobile',  $request['mobile'])->where('created_at', '>=', Carbon::now()->subMinutes(10)->toDateTimeString())->where(['is_expired'=> false,'is_login'=> false])->first();
-        if ($verified) {
-            return $this->SuccessResponse(200, 'Otp already send to your registered  mobile number', null);
+        elseif($request["type"]== 2){
+            $validator = Validator::make($request->all(), [
+                'value' => 'required|email'
+            ],['value.required'=>'email field required ..!']);
+            if ($validator->fails()) {
+                return $this->ErrorResponse(200, $validator->errors()->first());
+            }
+            return  $this->send_otp($request['value'],$request['type']);
         }
-//        $otp = rand(99999, 1000000);
-            $otp= '123456';
-        $token = md5($request->mobile . time());
-        $send = Temp_token::create([
-            'mobile' => $request['mobile'],
-            'otp' => $otp,
-            'token' => $token,
-            'is_login'=> false
-        ]);
-//        $sms= "https://www.fast2sms.com/dev/bulkV2?authorization=wvicxQVfhgG17T8uSbjKoeJWPzpUlMRZ64IYqaFNy5nsE9Ck2DO5CQIwRhE14rxa0DtpTV7UieZfFlbk&variables_values=".$otp."&route=otp&numbers=".$request->mobile;
-//        file_get_contents($sms);
-
-        if (!$send) {
-            return $this->ErrorResponse(200, 'Something went wrong. Please try again after sometime');
+        else{
+            return $this->SuccessResponse(200,'Register with kal..??');
         }
-        return $this->SuccessResponse(200, 'Otp has been sent to your register mobile number', array('token' => $send->token));
     }
 
     public function authentication(){
@@ -290,5 +290,87 @@ class AuthController extends Controller
         return  $this->SuccessResponse(200,'Otp verify successfully ..!',$user);
     }
 
+    /***
+     * @return bool
+     * check user exists or not and
+     * send otp to  register mobile and email id
+     */
+    public function send_otp($value,$type)
+    {
+        //checking user exist or not
+        if (user::where('mobile', $value)->orWhere('email',$value)->exists()) {
+            return $this->ErrorResponse(200, 'User already exists ..! Kindly login');
+        }
+        // checking otp send or not
+        $verified = Temp_token::where('mobile', $value)->orWhere('email',$value)->where('created_at', '>=', Carbon::now()->subMinutes(10)->toDateTimeString())->where(['is_expired'=> false,'is_login'=> false])->first();
+        if ($verified) {
+            return $this->SuccessResponse(200, 'Otp already send to your registered  mobile number', null);
+        }
+
+        //if not sent then sent now
+//        $otp = rand(99999, 1000000);
+        $otp= '123456';
+        $token = md5($value . time());
+        if($type== 1){
+            //        $sms= "https://www.fast2sms.com/dev/bulkV2?authorization=wvicxQVfhgG17T8uSbjKoeJWPzpUlMRZ64IYqaFNy5nsE9Ck2DO5CQIwRhE14rxa0DtpTV7UieZfFlbk&variables_values=".$otp."&route=otp&numbers=".$request->mobile;
+            //        file_get_contents($sms);
+            $send = Temp_token::create([
+                'mobile' => $value,
+                'otp' => $otp,
+                'token' => $token,
+                'is_login'=> false
+            ]);
+            return $this->SuccessResponse(200, 'Otp has been sent to your register mobile number', array('token' => $send->token));
+        }
+        if($type== 2){
+            $send = Temp_token::create([
+                'email' => $value,
+                'otp' => $otp,
+                'token' => $token,
+                'is_login'=> false
+            ]);
+            return $this->SuccessResponse(200, 'Otp has been sent to your register Email id', array('token' => $send->token));
+        }
+
+    }
+
+    public function login_with_google(Request $request)
+    {
+        $validator= Validator::make($request->all(),[
+            'google_id'=>'required',
+            'email'=>'required',
+            'fname'=>'nullable',
+            'lname'=>'nullable',
+            'profile' => 'nullable|image|mimes:jpg,png,jpeg'
+        ]);
+        if($validator->fails()){
+            return $this->ErrorResponse(200,$validator->errors()->first());
+        }
+
+        if(User::where('google_id',$request->google_id)->exists()){
+            $user= User::where('google_id')->get()->first();
+            $user['token'] =  'Bearer ' . $user->createToken('auth_token')->plainTextToken;
+            return $this->SuccessResponse(200,'user login successfully ..',$user);
+        }
+
+        if(User::where('email',$request->email)->exists()){
+            $user= User::where('email',$request->email)->get()->first();
+            $user->update([
+               'fname'=>$request->fname,
+               'lname'=>$request->lname,
+               'google_id'=>$request['google_id']
+            ]);
+            $user['token'] =  'Bearer ' . $user->createToken('auth_token')->plainTextToken;
+            return $this->SuccessResponse(200,'user login successfully ..',$user);
+        }
+        $u= User::create($request->all());
+        if($u){
+            if($request->hasFile('profile') && $request->file('profile')->isValid()){
+                $u->addMediaFromRequest('image')->toMediaCollection('profile');
+            }
+        }
+        $u['token'] =  'Bearer ' . $u->createToken('auth_token')->plainTextToken;
+        return $this->SuccessResponse(200,'user login successfully ..',$u);
+    }
 
 }

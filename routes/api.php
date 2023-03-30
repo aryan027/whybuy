@@ -155,3 +155,4 @@ Route::get('about-us',[AboutUsController::class,'AboutUs']);
 Route::get('authentication',[AuthController::class,'authentication'])->name('authentication');
 Route::get('login/google', [LoginController::class,'redirectToGoogle']);
 Route::get('login/google/callback', [LoginController::class,'handleGoogleCallback']);
+Route::post('google/login',[AuthController::class,'login_with_google']);

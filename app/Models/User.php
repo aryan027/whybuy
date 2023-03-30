@@ -40,6 +40,7 @@ class User extends Authenticatable implements HasMedia
         'status',
         'dob',
         'mobile',
+        'google_id'
 
     ];
 

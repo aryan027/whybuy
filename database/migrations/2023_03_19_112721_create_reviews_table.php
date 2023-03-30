@@ -19,6 +19,8 @@ return new class extends Migration
             $table->foreign('user_id')->on('users')->references('id')->onUpdate('cascade')->onDelete('cascade');
             $table->string('review')->nullable();
             $table->integer('rating')->nullable();
+            $table->unsignedBigInteger('rent_id')->nullable();
+            $table->foreign('rent_id')->references('id')->on('rent_items')->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();
         });
     }

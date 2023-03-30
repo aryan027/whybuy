@@ -13,6 +13,7 @@ class ReviewController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'ad_id'=>'required',
+            'rent_id'=>'required|integer',
             'rating' => 'required_without:review|integer|between:1,5',
             'review' => 'required_without:rating|string|max:255',
         ]);
@@ -25,6 +26,7 @@ class ReviewController extends Controller
         // Create the new app review
         $review = Review::create([
             'user_id'=>auth()->id(),
+            'rent_id'=>$request['rent_id'],
             'rating'=>$request['rating'],
             'review'=>$request['review'],
             'ad_id'=>$request['ad_id']
@@ -40,12 +42,12 @@ class ReviewController extends Controller
         if ($validator->fails()) {
             return $this->ErrorResponse(200,$validator->errors()->first());
         }
-        $list= Review::with('ads')->where(['ad_id'=>$request->ad_id])->get();
+        $list= Review::with('ads','rent')->where(['ad_id'=>$request->ad_id])->get();
         return $this->SuccessResponse(200,'Data fetch successfully ..!',$list);
     }
     public function review_user_list(Request $request){
 
-        $list= Review::with('ads')->where(['user_id'=>auth()->id()])->get();
+        $list= Review::with('ads','rent')->where(['user_id'=>auth()->id()])->get();
         return $this->SuccessResponse(200,'Data fetch successfully ..!',$list);
     }
 
