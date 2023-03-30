@@ -231,6 +231,10 @@ class UserController extends Controller
 
                 $addresses = $this->addresses->where(['id' => $request->address_id,'user_id' => $user->id])->first();
                 if(!empty($addresses)){
+                    $rentAddress = $addresses->rendAddress;
+                    if(count($rentAddress) > 0){
+                        return $this->ErrorResponse(200, 'You can not delete address. Beacuse this address provide by multiple order item.');
+                    }
                     $addresses->delete();
                     return $this->SuccessResponse(200, 'Address deleted successfully');
                 }

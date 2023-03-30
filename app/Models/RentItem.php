@@ -8,6 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class RentItem extends Model
 {
     use HasFactory;
+    const IS_PENDING = 0;
+    const IS_APPROVED = 1;
+    const IS_CONFIRM = 2;
+    const IS_CANCEL = 3;
+    const IS_COMPLETED_BY_USER = 4;
+    const IS_COMPLETED_BY_OWNER = 5;
+    const IS_SUBMITED_BY_USER = 6;
+
     protected $guarded =['id'];
 
     public function ads(){

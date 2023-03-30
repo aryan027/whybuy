@@ -93,6 +93,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
        Route::post('/item/invoice',[RentItemController::class,'invoice']);
        Route::post('/item/cancel-item',[RentItemController::class,'cancelItem']);
        Route::get('/item/given-taken',[RentItemController::class,'givenTaken']);
+       Route::post('/item/completed-by-user',[RentItemController::class,'completedByUser']);
 
     });
     Route::get('packages',[PackageController::class,'package_listing']);

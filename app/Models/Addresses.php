@@ -9,4 +9,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Addresses extends Model
 {
     use HasFactory,SoftDeletes;
+
+    public function rendAddress(){
+        return $this->hasMany(RentItem::class,'address_id');
+    }
 }
