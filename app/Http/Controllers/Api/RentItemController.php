@@ -451,9 +451,9 @@ class RentItemController extends Controller
         }
     }
 
-     // Order Completed By User
-     public function completedByUser(Request $request){
-        // try {
+    // Order Completed By User
+    public function completedByUser(Request $request){
+        try {
             $user = auth()->user();
             if(!empty($user)){
                 $validator= Validator::make($request->all(),[
@@ -472,23 +472,64 @@ class RentItemController extends Controller
                             $receiverId = $rentItem->owner_id;
                             $senderId = $rentItem->user_id;
                             $type = 'completed_by_user';
-                            $message = 'Order completed by user';
+                            $message = 'Order completed by user. please complete your order then user submited your item.';
                             $status = 3; // Completed
                             $this->storeNotification($senderId,$receiverId,$status,$rentItem->id,$type,$message);
                         }
                         return  $this->SuccessResponse(200,'Order completed successfully.',$rentItem);    
                     }
-                    return $this->ErrorResponse(200, 'You can not completed this order. Becuase this order not confirm by owner.');
+                    return $this->ErrorResponse(200, 'You can not complete this order. Becuase this order not confirm by owner.');
                 }
                 return $this->ErrorResponse(200, 'Not Found');
             }
             return $this->ErrorResponse(401, 'Unauthenticated');
-        // } catch (Exception $exception) {
-        //     logger('error occurred in user fetching process');
-        //     logger(json_encode($exception));
-        //     return $this->ErrorResponse(500, 'Something Went Wrong');
-        // }
+        } catch (Exception $exception) {
+            logger('error occurred in user fetching process');
+            logger(json_encode($exception));
+            return $this->ErrorResponse(500, 'Something Went Wrong');
+        }
     }
+
+      // Order Completed By Owner
+      public function completedByOwner(Request $request){
+        try {
+            $user = auth()->user();
+            if(!empty($user)){
+                $validator= Validator::make($request->all(),[
+                    'rent_item_id'=>'required|integer|exists:rent_items,id',
+                ]);
+                if($validator->fails()){
+                    return $this->ErrorResponse(400,$validator->errors()->first());
+                }
+                $rentItem = RentItem::where(['id' => $request->rent_item_id,'owner_id' => $user->id])->first();
+                if(!empty($rentItem)){
+                    // IS_COMPLETED_BY_USER means 4 value and completed by user
+                    if($rentItem->status == RentItem::IS_COMPLETED_BY_USER){
+                        $rentItem->status = RentItem::IS_COMPLETED_BY_OWNER;
+                        $rentItem->save();
+                        if($rentItem){
+                            $senderId = $rentItem->owner_id;
+                            $receiverId = $rentItem->user_id;
+                            $type = 'completed_by_owner';
+                            $message = 'Order completed by owner. Please submit owner item';
+                            $status = 3; // Completed
+                            $this->storeNotification($senderId,$receiverId,$status,$rentItem->id,$type,$message);
+                        }
+                        return  $this->SuccessResponse(200,'Order complete successfully.',$rentItem);    
+                    }
+                    return $this->ErrorResponse(200, 'You can not complete this order. Becuase this order not complete by user.');
+                }
+                return $this->ErrorResponse(200, 'Not Found');
+            }
+            return $this->ErrorResponse(401, 'Unauthenticated');
+        } catch (Exception $exception) {
+            logger('error occurred in user fetching process');
+            logger(json_encode($exception));
+            return $this->ErrorResponse(500, 'Something Went Wrong');
+        }
+    }
+
+    
 
     
     
