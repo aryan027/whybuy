@@ -50,8 +50,20 @@ class Advertisement extends Model implements HasMedia
         return $this->belongsTo(User::class,'user_id');
     }
 
+    public function address(){
+        return $this->belongsTo(Addresses::class,'address_id');
+    }
+
     public function getSeenHistory(){
         return $this->hasMany(AdsSeenHistory::class,'ads_id');
+    }
+
+    public function getRentOrder(){
+        return $this->hasMany(RentItem::class,'ads_id');
+    }
+
+    public function getReview(){
+        return $this->hasMany(Review::class,'ad_id');
     }
 
     public function registerMediaConversions(Media $media = null): void

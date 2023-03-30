@@ -48,9 +48,7 @@ class AdController extends Controller
             'yearly_rent' => 'required|integer',
             'item_condition' => 'required|string',
             'owner_type' => 'required|string',
-            'address' => 'required|string',
-            'latitude' => 'required|string',
-            'longitude' => 'required|string',
+            'address_id' => 'required|integer|exists:addresses,id',
             'purpose' => 'required',
             // 'image' => 'required|mimes:jpg,jpeg,png'
             'image' => 'required',
@@ -82,7 +80,7 @@ class AdController extends Controller
         try {
             $user = auth()->user();
             if(!empty($user)){
-                $ads = Advertisement::with('subCategory', 'category','media')->where(['status' => true, 'approved' => true, 'published' => true])->where('user_id','!=',$user->id);
+                $ads = Advertisement::with('subCategory', 'category','media','getReview')->where(['status' => true, 'approved' => true, 'published' => true])->where('user_id','!=',$user->id);
                 $search = $request->search;
                 $category = $request->category;
                 $subCategory = $request->subCategory;
@@ -153,7 +151,7 @@ class AdController extends Controller
     }
 
     public function myAds() {
-        $ads = Advertisement::with('subCategory', 'category')->where(['user_id' => auth()->id(),'status' => true, 'published' => true])->latest()->get();
+        $ads = Advertisement::with('subCategory', 'category','address','review_rating')->where(['user_id' => auth()->id(),'status' => true, 'published' => true])->latest()->get();
         $ads = collect($ads)->map(function($q) {
             $q->seen_count = (count($q->getSeenHistory) > 0) ? $q->getSeenHistory->count() : 0;
             $q->media = ($q->getFirstMediaUrl('ads'));
@@ -161,38 +159,6 @@ class AdController extends Controller
             return $q;
         });
         return $this->SuccessResponse(200, 'Advertisement Fetched Successfully', $ads);
-    }
-
-    // Get app address for particular user
-    public function published(Request $request)
-    {
-        try {
-            $user = auth()->user();
-            if(!empty($user)){
-                $validator= Validator::make($request->all(),[
-                    'advertisent_id'=>'required|integer|exists:advertisements,id',
-                ]);
-                if($validator->fails()){
-                    return $this->ErrorResponse(400,$validator->errors()->first());
-                }
-
-                $advertisement = Advertisement::where('id',$request->advertisent_id)->where('user_id',$user->id)->first();
-                if(!empty($advertisement)){
-                    if($advertisement->approved == 1){
-                        $advertisement->published = 1;
-                        $advertisement->save();
-                        return $this->SuccessResponse(200, 'Advertisement published successfully');
-                    }
-                    return $this->ErrorResponse(401, 'Your advertisement can not approved by admin. Please contact your administrator.');
-                }
-                return $this->ErrorResponse(404, 'Advertisement not found');
-            }
-            return $this->ErrorResponse(500, 'Something Went Wrong');
-        } catch (Exception $exception) {
-            logger('error occurred in addresses fetching process');
-            logger(json_encode($exception));
-            return $this->ErrorResponse(500, 'Something Went Wrong');
-        }
     }
 
     // Get Advertisement Detail
@@ -208,11 +174,12 @@ class AdController extends Controller
                     return $this->ErrorResponse(400,$validator->errors()->first());
                 }
 
-                $advertisement = Advertisement::with('subCategory', 'category','user','user.media')->where('id',$request->advertisent_id)->first();
+                $advertisement = Advertisement::with('subCategory', 'category','user','user.media','address')->where('id',$request->advertisent_id)->first();
                 if(!empty($advertisement)){
                     $favotiteAds = FavouriteAds::where(['user_id' => $user->id,'ads_id' => $advertisement->id])->first();
                     $advertisement->seen_count = (count($advertisement->getSeenHistory) > 0) ? $advertisement->getSeenHistory->count() : 0;
                     $advertisement->favorite = $favotiteAds;
+                    $advertisement->review_rating = $advertisement->getReview;
                     $advertisement->media = $advertisement->getFirstMediaUrl('ads');
                     $getSimilarProduct  = Advertisement::with('media')->where('sub_category',$advertisement->sub_category)->where('id','!=',$advertisement->id)->orderBy('id','DESC')->limit(10)->get();
                     $advertisement->similar_product = $getSimilarProduct;
@@ -282,10 +249,8 @@ class AdController extends Controller
                     'yearly_rent' => 'required|integer',
                     'item_condition' => 'required|string',
                     'owner_type' => 'required|string',
-                    'address' => 'required|string',
-                    'latitude' => 'required|string',
-                    'longitude' => 'required|string',
-                    'image.*' => 'mimes:jpeg,png,jpg'
+                    'address_id' => 'required|integer|exists:addresses,id',
+                    // 'image.*' => 'mimes:jpeg,png,jpg'
                 ]);
                 if ($validator->fails()) {
                     return $this->ErrorResponse(400,$validator->errors()->first());
@@ -385,5 +350,38 @@ class AdController extends Controller
             return $this->ErrorResponse(500, 'Something Went Wrong');
         }
     }
+
+    // Trending
+    public function deleteAds(Request $request)
+    {
+        try {
+            $user = auth()->user();
+            if(!empty($user)){
+                $validator= Validator::make($request->all(),[
+                    'ads_id'=>'required|integer|exists:advertisements,id',
+                ]);
+                if($validator->fails()){
+                    return $this->ErrorResponse(200,$validator->errors()->first());
+                }
+                $ads = Advertisement::where('id',$request->ads_id)->where('user_id',$user->id)->first();
+                if(!empty($ads)){
+                    $adsOrder = $ads->getRentOrder->count();
+                    if($adsOrder > 0){
+                        return $this->ErrorResponse(200, 'You can not delete this Advertisement.Becuase this Advertisement provide by multiple orders.');
+                    }
+                    $ads->delete();
+                    return $this->SuccessResponse(200, 'Advertisement deleted Successfully');
+                }
+                return $this->ErrorResponse(200, 'Advertisement Not Found');
+            }
+            return $this->ErrorResponse(401, 'Unauthorized');
+        } catch (Exception $exception) {
+            logger('error occurred in ads fetching process');
+            logger(json_encode($exception));
+            return $this->ErrorResponse(500, 'Something Went Wrong');
+        }
+    }
+
+    
     
 }

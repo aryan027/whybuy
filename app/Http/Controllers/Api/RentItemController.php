@@ -32,6 +32,7 @@ class RentItemController extends Controller
                     'rent_type'=>'required|in:day',
                     'start'=>'required|date_format:Y-m-d H:i|after_or_equal:today',
                     'end' =>'required|date_format:Y-m-d H:i|after_or_equal:start',
+                    'address_id' => 'required|integer|exists:addresses,id',
                     'description'=>'nullable',
                     'purpose'=>'nullable'
                 ]);
@@ -57,7 +58,7 @@ class RentItemController extends Controller
                         //         }
                         //     }
                         // }
-                        $price = $advertisement->daily_rent;
+                        $price = ($request->price) ? $request->price :  $advertisement->daily_rent;
                         $item= RentItem::create([
                             'ads_id'=>$request->ads_id,
                             'user_id'=> $user->id,
@@ -65,6 +66,7 @@ class RentItemController extends Controller
                             'rent_type'=>$request->rent_type,
                             'start'=> $request->start,
                             'end' => $request->end,
+                            'address_id' => $request->address_id,
                             'price'=> $price,
                             'deposite_amount' => $advertisement->deposit_amount,
                             'description'=>$request->description,
@@ -136,7 +138,7 @@ class RentItemController extends Controller
                 if($validator->fails()){
                     return $this->ErrorResponse(200,$validator->errors()->first());
                 }
-                $rentitem= RentItem::with('ads','users','owners')->where('id',$request->rent_id)->first();
+                $rentitem= RentItem::with('ads','users.media','owners.media','rentAddress')->where('id',$request->rent_id)->first();
                 if(!empty($rentitem)){
                     return $this->SuccessResponse(200, 'Rent detail Fetched Successfully', $rentitem);
                 }
@@ -273,7 +275,7 @@ class RentItemController extends Controller
                     }
                     return  $this->SuccessResponse(200,'Rental agreement accepted.');
                 }
-               return $this->ErrorResponse(200, 'Invalid rent form');
+               return $this->ErrorResponse(200, 'Invalid rent');
             }
             return $this->ErrorResponse(401, 'Unauthenticated');
         } catch (Exception $exception) {
@@ -420,5 +422,74 @@ class RentItemController extends Controller
             return $this->ErrorResponse(500, 'Something Went Wrong');
         }
     }
+
+     // My Given Taken Order Item List
+     public function givenTaken(Request $request){
+        try {
+            $user = auth()->user();
+            if(!empty($user)){
+                $validator= Validator::make($request->all(),[
+                    'type'=>'required|in:given,taken',
+                ]);
+                if($validator->fails()){
+                    return $this->ErrorResponse(400,$validator->errors()->first());
+                }
+                $rentitem = RentItem::with('ads','owners.media');
+                if($request->type == 'given'){
+                    $rentitem = $rentitem->where('owner_id',$user->id);
+                }else{
+                    $rentitem = $rentitem->where('user_id',$user->id);
+                }
+                $rentitem = $rentitem->latest()->paginate(20);
+                return  $this->SuccessResponse(200,'Data etched successfully.',$rentitem);    
+            }
+            return $this->ErrorResponse(401, 'Unauthenticated');
+        } catch (Exception $exception) {
+            logger('error occurred in user fetching process');
+            logger(json_encode($exception));
+            return $this->ErrorResponse(500, 'Something Went Wrong');
+        }
+    }
+
+     // Order Completed By User
+     public function completedByUser(Request $request){
+        // try {
+            $user = auth()->user();
+            if(!empty($user)){
+                $validator= Validator::make($request->all(),[
+                    'rent_item_id'=>'required|integer|exists:rent_items,id',
+                ]);
+                if($validator->fails()){
+                    return $this->ErrorResponse(400,$validator->errors()->first());
+                }
+                $rentItem = RentItem::where(['id' => $request->rent_item_id,'user_id' => $user->id])->first();
+                if(!empty($rentItem)){
+                    // IS_CONFIRM means 2 value and confirm by owner
+                    if($rentItem->status == RentItem::IS_CONFIRM){
+                        $rentItem->status = RentItem::IS_COMPLETED_BY_USER;
+                        $rentItem->save();
+                        if($rentItem){
+                            $receiverId = $rentItem->owner_id;
+                            $senderId = $rentItem->user_id;
+                            $type = 'completed_by_user';
+                            $message = 'Order completed by user';
+                            $status = 3; // Completed
+                            $this->storeNotification($senderId,$receiverId,$status,$rentItem->id,$type,$message);
+                        }
+                        return  $this->SuccessResponse(200,'Order completed successfully.',$rentItem);    
+                    }
+                    return $this->ErrorResponse(200, 'You can not completed this order. Becuase this order not confirm by owner.');
+                }
+                return $this->ErrorResponse(200, 'Not Found');
+            }
+            return $this->ErrorResponse(401, 'Unauthenticated');
+        // } catch (Exception $exception) {
+        //     logger('error occurred in user fetching process');
+        //     logger(json_encode($exception));
+        //     return $this->ErrorResponse(500, 'Something Went Wrong');
+        // }
+    }
+
+    
     
 }
