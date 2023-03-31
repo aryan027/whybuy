@@ -110,6 +110,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post('{cid}/delete', [ChatController::class, 'deleteChat']);
         Route::post('delete/all', [ChatController::class, 'deleteAllChat']);
         Route::post('list/aid', [ChatController::class, 'adChatList']);
+        Route::get('list/{id}', [ChatController::class, 'ChatList']);
         Route::get('user/list', [ChatController::class, 'listingOfUser']);
     });
 

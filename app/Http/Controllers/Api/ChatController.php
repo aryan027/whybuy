@@ -86,6 +86,10 @@ class ChatController extends Controller
         $chats = ChatInteractions::with('ownerInfo', 'userInfo', 'chats')->where(['owner_id' => auth()->id(),'status' => true])->get();
         return $this->SuccessResponse(200, 'fetched successfully', $chats);
     }
+    public function ChatList($id) {
+        $chats = ChatInteractions::with('ownerInfo', 'userInfo', 'chats')->where(['id' => $id,'status' => true])->get();
+        return $this->SuccessResponse(200, 'fetched successfully', $chats);
+    }
 
     public function deleteChat($cid) {
         $chat = ChatInteractions::find($cid);
