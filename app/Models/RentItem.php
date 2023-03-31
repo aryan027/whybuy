@@ -34,4 +34,8 @@ class RentItem extends Model
         return $this->belongsTo(Addresses::class,'address_id');
     }
 
+    public function getRentTransaction(){
+        return $this->hasOne(TransactionHistory::class,'rent_id');
+    }
+
 }
