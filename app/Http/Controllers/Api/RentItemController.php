@@ -478,7 +478,7 @@ class RentItemController extends Controller
                         }
                         return  $this->SuccessResponse(200,'Order completed successfully.',$rentItem);    
                     }
-                    return $this->ErrorResponse(200, 'You can not complete this order. Becuase this order not confirm by owner.');
+                    return $this->ErrorResponse(200, 'You can not complete this order. Because this order not confirm by owner.');
                 }
                 return $this->ErrorResponse(200, 'Not Found');
             }
@@ -490,8 +490,8 @@ class RentItemController extends Controller
         }
     }
 
-      // Order Completed By Owner
-      public function completedByOwner(Request $request){
+    // Order Completed By Owner
+    public function completedByOwner(Request $request){
         try {
             $user = auth()->user();
             if(!empty($user)){
@@ -517,7 +517,46 @@ class RentItemController extends Controller
                         }
                         return  $this->SuccessResponse(200,'Order complete successfully.',$rentItem);    
                     }
-                    return $this->ErrorResponse(200, 'You can not complete this order. Becuase this order not complete by user.');
+                    return $this->ErrorResponse(200, 'You can not complete this order. Because this order not complete by user.');
+                }
+                return $this->ErrorResponse(200, 'Not Found');
+            }
+            return $this->ErrorResponse(401, 'Unauthenticated');
+        } catch (Exception $exception) {
+            logger('error occurred in user fetching process');
+            logger(json_encode($exception));
+            return $this->ErrorResponse(500, 'Something Went Wrong');
+        }
+    }
+
+       // Order Submited By User
+       public function submitedByUser(Request $request){
+        try {
+            $user = auth()->user();
+            if(!empty($user)){
+                $validator= Validator::make($request->all(),[
+                    'rent_item_id'=>'required|integer|exists:rent_items,id',
+                ]);
+                if($validator->fails()){
+                    return $this->ErrorResponse(400,$validator->errors()->first());
+                }
+                $rentItem = RentItem::with('getRentTransaction')->where(['id' => $request->rent_item_id,'user_id' => $user->id])->first();
+                if(!empty($rentItem)){
+                    // IS_COMPLETED_BY_USER means 4 value and completed by user
+                    if($rentItem->status == RentItem::IS_COMPLETED_BY_OWNER){
+                        $rentItem->status = RentItem::IS_SUBMITED_BY_USER;
+                        $rentItem->save();
+                        if($rentItem){
+                            $receiverId = $rentItem->owner_id;
+                            $senderId = $rentItem->user_id;
+                            $type = 'submited_by_user';
+                            $message = 'Item submited by user. Please check your item';
+                            $status = 3; // Completed
+                            $this->storeNotification($senderId,$receiverId,$status,$rentItem->id,$type,$message);
+                        }
+                        return  $this->SuccessResponse(200,'Item submited successfully.',$rentItem);    
+                    }
+                    return $this->ErrorResponse(200, 'You can not submited this item. Because this order not complete by owner.');
                 }
                 return $this->ErrorResponse(200, 'Not Found');
             }

@@ -95,6 +95,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
        Route::get('/item/given-taken',[RentItemController::class,'givenTaken']);
        Route::post('/item/completed-by-user',[RentItemController::class,'completedByUser']);
        Route::post('/item/completed-by-owner',[RentItemController::class,'completedByOwner']);
+       Route::post('/item/submited-by-user',[RentItemController::class,'submitedByUser']);
 
     });
     Route::get('packages',[PackageController::class,'package_listing']);
