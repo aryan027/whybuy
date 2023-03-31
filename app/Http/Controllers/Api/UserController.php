@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Countries;
@@ -313,9 +314,13 @@ class UserController extends Controller
                 if($validator->fails()){
                     return $this->ErrorResponse(200,$validator->errors()->first());
                 }
-                $user->device_type = $request->device_type;
-                $user->device_token = $request->device_token;
-                $user->save();
+//                $user->device_type = $request->device_type;
+//                $user->device_token = $request->device_token;
+//                $user->save();
+                 User::find(auth()->id())->update([
+                    'device_type'=> $request->device_type,
+                    'device_token'=> $request->device_token
+                 ]);
                 return $this->SuccessResponse(200, 'Device token updated successfully',$user);
             }
             return $this->ErrorResponse(401, 'Unauthenticated');
@@ -395,6 +400,6 @@ class UserController extends Controller
              return $this->ErrorResponse(500, 'Something Went Wrong');
          }
      }
-    
+
 
 }
