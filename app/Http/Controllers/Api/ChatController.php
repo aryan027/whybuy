@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Advertisement;
 use App\Models\ChatInteractions;
 use App\Models\ChatMessages;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -53,10 +54,15 @@ class ChatController extends Controller
             'content' => $request['message'] ?? null,
             'chat_id' => $cid
         );
+        $user= User::find($init['user_id']);
         if ($init['owner_id'] != auth()->id()) {
             $data['sent_by_owner'] = false;
+//            $user= User::find($init['user_id']);
+            $this->SendMobileNotification(null,$user,$request['message']);
         } else {
             $data['sent_by_owner'] = true;
+            $owener= User::find($init['user_id']);
+            $this->SendMobileNotification(null,$user,$request['message']);
         }
         if ($request->hasFile('media')) {
             $file = $request->file('media');
@@ -72,6 +78,7 @@ class ChatController extends Controller
             $data['media_url'] = null;
         }
         $message = ChatMessages::create($data);
+
         return $this->SuccessResponse(200, 'message sent successfully', $message);
     }
 
