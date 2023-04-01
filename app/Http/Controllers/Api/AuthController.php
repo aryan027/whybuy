@@ -99,7 +99,12 @@ class AuthController extends Controller
             return $this->ErrorResponse(200,'Otp is not valid/expired ..!');
         }
         $data= Temp_token::where(['token' =>$token,'otp'=>$otp,'is_login'=>true,'is_expired'=>false])->first();
-        $user= User::where('mobile',$data->mobile)->orWhere('email',$data->email)->first();
+        $user = User::when(function($query) use($data){
+            return $query->where(['mobile'=> $data->mobile]);
+        })->when(function($query) use($data){
+            return $query->Where(['email' => $data->email]);
+        })
+            ->first();
         $data->delete();
         if(!$user){
             return $this->ErrorResponse(200,'Something went wrong ..!');
