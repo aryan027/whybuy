@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Wallet;
+use GuzzleHttp\Client;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
@@ -130,12 +131,12 @@ class Controller extends BaseController
                     "notification" => [
                         "priority" => "high",
                         "title" => config('app.name'),
-                        "body" => $message,  
+                        "body" => $message,
                     ],
                     'data' => $responseData,
                     "content_available" => true,
                 ];
-        
+
                 $dataString = json_encode($data);
                 $headers = [
                     'Authorization: key='.$SERVER_API_KEY,
@@ -153,9 +154,119 @@ class Controller extends BaseController
             }
 
         } catch (Exception $e) {
-			
+
         }
-		
+
     }
+
+
+    public function sendNotification($title, $body, $image = null, $token)
+    {
+        // FCM server key
+        $serverKey =config('app.SERVER_API_KEY');
+        $message = [
+            'title' => $title,
+            'body' => $body,
+        ];
+        if ($image) {
+            $message['image'] = $image;
+        }
+        // FCM API endpoint
+        $url = 'https://fcm.googleapis.com/fcm/send';
+
+        // HTTP client
+        $client = new Client();
+        $headers = [
+            'Authorization' => 'key=' . $serverKey,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json'
+        ];
+
+        // HTTP body
+        $body = [
+            'notification' => $message,
+            'to' => $token['device_token']
+        ];
+
+        // Send HTTP POST request
+        $response = $client->post($url, [
+            'headers' => $headers,
+            'json' => $body
+        ]);
+
+        // Get response body
+        $responseBody = $response->getBody();
+
+        // Return response
+        return  json_decode($responseBody);
+    }
+
+//    public function sendNotification($title, $body, $image, $product, $token, $platform)
+//    {
+//        // FCM server key
+//        $serverKey = 'your_server_key_here';
+//
+//        // Notification message
+//        $message = [
+//            'title' => $title,
+//            'body' => $body,
+//            'product' => $product,
+//            'sound' => 'default'
+//        ];
+//
+//        // FCM API endpoint
+//        $url = 'https://fcm.googleapis.com/fcm/send';
+//
+//        // HTTP client
+//        $client = new Client();
+//
+//        // HTTP headers
+//        $headers = [
+//            'Authorization' => 'key=' . $serverKey,
+//            'Content-Type' => 'application/json',
+//            'Accept' => 'application/json'
+//        ];
+//
+//        // HTTP body
+//        $body = [
+//            'notification' => $message,
+//            'to' => $token
+//        ];
+//
+//        if($platform === 'android') {
+//            $body['android'] = [
+//                'priority' => 'high',
+//                'notification' => $message
+//            ];
+//        } elseif($platform === 'ios') {
+//            $body['apns'] = [
+//                'payload' => [
+//                    'aps' => [
+//                        'alert' => [
+//                            'title' => $title,
+//                            'body' => $body
+//                        ],
+//                        'badge' => 1,
+//                        'sound' => 'default'
+//                    ]
+//                ]
+//            ];
+//        }
+//
+//        // Send HTTP POST request
+//        $response = $client->post($url, [
+//            'headers' => $headers,
+//            'json' => $body
+//        ]);
+//
+//        // Get response body
+//        $responseBody = $response->getBody();
+//
+//        // Return response
+//        return response()->json([
+//            'status' => 'success',
+//            'response' => json_decode($responseBody)
+//        ]);
+//    }
 
 }

@@ -50,20 +50,13 @@ class ChatController extends Controller
         if (!$init['status']) {
             return $this->ErrorResponse(200, 'Can not send chat! may be deleted');
         }
+        $ads= Advertisement::find($init['advertisement_id']);
         $data = array(
             'content' => $request['message'] ?? null,
             'chat_id' => $cid
         );
 
-        if ($init['owner_id'] != auth()->id()) {
-            $data['sent_by_owner'] = false;
-            $user= User::find($init['owner_id']);
-            $this->SendMobileNotification(null,$user,$request['message']);
-        } else {
-            $data['sent_by_owner'] = true;
-            $owener= User::find($init['user_id']);
-            $this->SendMobileNotification(null,$owener,$request['message']);
-        }
+
         if ($request->hasFile('media')) {
             $file = $request->file('media');
             $extension = $file->extension();
@@ -76,6 +69,15 @@ class ChatController extends Controller
         } else {
             $data['is_media'] = false;
             $data['media_url'] = null;
+        }
+        if ($init['owner_id'] != auth()->id()) {
+            $data['sent_by_owner'] = false;
+            $user= User::find($init['owner_id']);
+            $this->sendNotification($ads['title'],$request['message'],null,$user);
+        } else {
+            $data['sent_by_owner'] = true;
+            $owener= User::find($init['user_id']);
+            $this->sendNotification($ads['title'],$request['message'],null,$owener);
         }
         $message = ChatMessages::create($data);
 
