@@ -100,9 +100,9 @@ class AuthController extends Controller
         }
         $data= Temp_token::where(['token' =>$token,'otp'=>$otp,'is_login'=>true,'is_expired'=>false])->first();
         $user = User::when(function($query) use($data){
-            return $query->where(['mobile'=> $data->mobile]);
+            return $query->where(['mobile'=> $data['mobile']]);
         })->when(function($query) use($data){
-            return $query->Where(['email' => $data->email]);
+            return $query->Where(['email' => $data['email']]);
         })
             ->first();
         $data->delete();
