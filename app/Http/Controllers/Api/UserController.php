@@ -314,13 +314,10 @@ class UserController extends Controller
                 if($validator->fails()){
                     return $this->ErrorResponse(200,$validator->errors()->first());
                 }
-//                $user->device_type = $request->device_type;
-//                $user->device_token = $request->device_token;
-//                $user->save();
-                 User::find(auth()->id())->update([
-                    'device_type'=> $request->device_type,
-                    'device_token'=> $request->device_token
-                 ]);
+                $user->device_type = $request->device_type;
+                $user->device_token = $request->device_token;
+                $user->save();
+//
                 return $this->SuccessResponse(200, 'Device token updated successfully',$user);
             }
             return $this->ErrorResponse(401, 'Unauthenticated');
