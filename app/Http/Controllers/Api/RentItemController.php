@@ -8,6 +8,7 @@ use App\Models\RentItem;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Exception;
 use DateTime;
@@ -59,7 +60,9 @@ class RentItemController extends Controller
                         //     }
                         // }
                         $price = ($request->price) ? $request->price :  $advertisement->daily_rent;
+                        $code = Str::upper(Str::random(10));
                         $item= RentItem::create([
+                            'code' => $code,
                             'ads_id'=>$request->ads_id,
                             'user_id'=> $user->id,
                             'owner_id' => $advertisement->user_id,
