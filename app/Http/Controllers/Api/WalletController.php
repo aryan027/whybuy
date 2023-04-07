@@ -25,8 +25,11 @@ class WalletController extends Controller
     public function wallet_details()
     {
         try {
-            $wallet = Wallet::where('user_id', auth()->id())->first();
-            return $this->SuccessResponse(200, 'Wallet Fetched', $wallet);
+            if(Wallet::where('user_id', auth()->id())->exists()){
+                $wallet = Wallet::where('user_id', auth()->id())->first();
+                return $this->SuccessResponse(200, 'Wallet Fetched', $wallet);
+            }
+            return $this->SuccessResponse(200, 'Wallet not created ', null);
         } catch (Exception $exception) {
             logger('error occurred in Wallet fetching process');
             logger(json_encode($exception));
