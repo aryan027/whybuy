@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('packages', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('package_name');
             $table->string('price');
             $table->string('no_of_ads');
             $table->string('status')->default(true);
