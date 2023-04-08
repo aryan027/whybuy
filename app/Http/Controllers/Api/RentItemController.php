@@ -444,7 +444,7 @@ class RentItemController extends Controller
                     $rentitem = $rentitem->where('user_id',$user->id);
                 }
                 $rentitem = $rentitem->latest()->paginate(20);
-                return  $this->SuccessResponse(200,'Data etched successfully.',$rentitem);    
+                return  $this->SuccessResponse(200,'Data Fetched successfully.',$rentitem);    
             }
             return $this->ErrorResponse(401, 'Unauthenticated');
         } catch (Exception $exception) {
