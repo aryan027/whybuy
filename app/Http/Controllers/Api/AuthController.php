@@ -134,6 +134,7 @@ class AuthController extends Controller
             return $query->Where(['email' => $request->email]);
         })
         ->first();
+        
 
         if (!empty($getUser)) {
             return $this->ErrorResponse(400, 'Your account is disable kindly contact to administrator ..!');
