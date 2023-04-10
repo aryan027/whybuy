@@ -35,6 +35,4 @@ class AgreementController extends Controller
         return view('cms.terms-condition',compact('termsCondition'));
             
     }
-
-    
 }
