@@ -3,7 +3,7 @@
       <tr>
         <th>Id</th>
         <th>Type</th>
-        <th>Description</th>
+        {{-- <th>Description</th> --}}
         <th>Action</th>
       </tr>
     </thead>
@@ -12,7 +12,7 @@
             <tr>
                 <td>{{ $loop->iteration }}</td>
                 <td>{{!empty($row->type) ? $row->type : '-'}}</td>
-                <td>{!! !empty($row->description) ? $row->description : '' !!}</td>
+                {{-- <td>{!! !empty($row->description) ? $row->description : '' !!}</td> --}}
                 <td>
                     <a href="{{route('cms.edit',encrypt($row->id))}}">
                         <i class="fa fa-pencil btn btn-primary" aria-hidden="true"></i>
