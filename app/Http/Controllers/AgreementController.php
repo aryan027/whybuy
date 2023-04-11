@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\RentItem;
+use App\Models\CMS;
 use App\Models\User;
 
 class AgreementController extends Controller
@@ -17,5 +18,21 @@ class AgreementController extends Controller
                 return view('agreement.form',compact('user','rentItem'));
             }
         }
+    }
+
+    // Privacy Policy
+    public function privacyPolicy(Request $request)
+    {
+        $privacyPolicy = CMS::where('type','privacy_policy')->first();
+        return view('cms.privacy-policy',compact('privacyPolicy'));
+            
+    }
+
+    //Terms & Condition
+    public function termsCondition(Request $request)
+    {
+        $termsCondition = CMS::where('type','terms_condition')->first();
+        return view('cms.terms-condition',compact('termsCondition'));
+            
     }
 }

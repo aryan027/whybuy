@@ -29,6 +29,8 @@ use App\Http\Controllers\AgreementController;
 //     return view('auth.login');
 // });
 Route::get('/agreement-form/{rent_item_id}/{user_id}', [AgreementController::class, 'agreementForm']);
+Route::get('/privacy-policy', [AgreementController::class, 'privacyPolicy']);
+Route::get('/terms-condition', [AgreementController::class, 'termsCondition']);
 
 Route::get('/', [App\Http\Controllers\HomeController::class, 'login']);
 Route::get('/admin', [App\Http\Controllers\HomeController::class, 'login']);

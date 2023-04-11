@@ -16,7 +16,7 @@ class AuthController extends Controller
 {
     public function register(Request $request){
         $validator = Validator::make($request->all(), [
-            'type' => 'required|integer|between:1,3'
+            'type' => 'required|integer|between:1,2'
         ]);
         if ($validator->fails()) {
             return $this->ErrorResponse(200, $validator->errors()->first());
@@ -134,6 +134,7 @@ class AuthController extends Controller
             return $query->Where(['email' => $request->email]);
         })
         ->first();
+        
 
         if (!empty($getUser)) {
             return $this->ErrorResponse(400, 'Your account is disable kindly contact to administrator ..!');
@@ -302,14 +303,21 @@ class AuthController extends Controller
      */
     public function send_otp($value,$type)
     {
-        //checking user exist or not
+        // dd(Carbon::now()->subMinutes(10)->toDateTimeString());
         if (user::where('mobile', $value)->orWhere('email',$value)->exists()) {
             return $this->ErrorResponse(200, 'User already exists ..! Kindly login');
         }
         // checking otp send or not
-        $verified = Temp_token::where('mobile', $value)->orWhere('email',$value)->where('created_at', '>=', Carbon::now()->subMinutes(10)->toDateTimeString())->where(['is_expired'=> false,'is_login'=> false])->first();
+        $verified = Temp_token::where(\DB::raw("(DATE_FORMAT(created_at,'%Y-%m-%d %H:%i'))"), '>=', Carbon::now()->subMinutes(10)->format('Y-m-d H:i'))->where(['is_expired'=> false,'is_login'=> false]);
+        if($type == '1' ){
+           $verified = $verified->where('mobile', $value);
+        }else{
+            $verified = $verified->where('email', $value);
+        }
+        $verified = $verified->latest()->first();
+        // dd($verified);
         if ($verified) {
-            return $this->SuccessResponse(200, 'Otp already send to your registered  mobile number', null);
+            return $this->SuccessResponse(200, 'Otp already send to your registered mobile number or email', null);
         }
 
         //if not sent then sent now
