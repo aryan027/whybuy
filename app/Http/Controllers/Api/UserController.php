@@ -112,6 +112,7 @@ class UserController extends Controller
                     'country_id'=>'required|exists:countries,id',
                     'latitude' => 'required',
                     'longitude' => 'required',
+                    'zipcode' => ['required', 'integer', 'digits:6'],
                 ]);
                 if($validator->fails()){
                     return $this->ErrorResponse(400,$validator->errors()->first());
@@ -124,6 +125,7 @@ class UserController extends Controller
                 $addresses->country_id = $request->country_id;
                 $addresses->latitude = $request->latitude;
                 $addresses->longitude = $request->longitude;
+                $addresses->zipcode = $request->zipcode;
                 $addresses->save();
                 return $this->SuccessResponse(200, 'Address Added Successfully',$addresses);
             }
@@ -192,6 +194,7 @@ class UserController extends Controller
                     'country_id'=>'required|exists:countries,id',
                     'latitude' => 'required',
                     'longitude' => 'required',
+                    'zipcode' => ['required', 'integer', 'digits:6'],
                 ]);
                 if($validator->fails()){
                     return $this->ErrorResponse(200,$validator->errors()->first());
@@ -204,6 +207,7 @@ class UserController extends Controller
                     $addresses->country_id = $request->country_id;
                     $addresses->latitude = $request->latitude;
                     $addresses->longitude = $request->longitude;
+                    $addresses->zipcode = $request->zipcode;
                     $addresses->save();
                     return $this->SuccessResponse(200, 'Address updated successfully',$addresses);
                 }
