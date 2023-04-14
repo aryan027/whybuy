@@ -85,5 +85,4 @@ class FavouriteController extends Controller
             return $this ->ErrorResponse(500, 'Something Went Wrong');
         }
     }
-
 }
