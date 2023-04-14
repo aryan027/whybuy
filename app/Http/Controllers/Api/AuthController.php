@@ -60,9 +60,12 @@ class AuthController extends Controller
             return $this->ErrorResponse(200, $validate->errors()->messages());
         }
         $temp= Temp_token::where(['token'=> $request->token,'is_expired'=>false])->first();
-        if(!Temp_token::where(['token'=> $request->token])->exists()){
+        if(empty($temp)){
             return $this->ErrorResponse(200,'Something went wrong ..!');
         }
+        // if(!Temp_token::where(['token'=> $request->token])->exists()){
+        //     return $this->ErrorResponse(200,'Something went wrong ..!');
+        // }
         if($temp->is_login == true){
             return $this->login_otp($request->token,$request->otp);
         }
@@ -99,12 +102,19 @@ class AuthController extends Controller
             return $this->ErrorResponse(200,'Otp is not valid/expired ..!');
         }
         $data= Temp_token::where(['token' =>$token,'otp'=>$otp,'is_login'=>true,'is_expired'=>false])->first();
-        $user = User::when(function($query) use($data){
-            return $query->where(['mobile'=> $data['mobile']]);
-        })->when(function($query) use($data){
-            return $query->Where(['email' => $data['email']]);
-        })
-            ->first();
+       
+        // $user = User::when(function($query) use($data){
+        //     return $query->where(['mobile'=> $data['mobile']]);
+        // })->when(function($query) use($data){
+        //     return $query->Where(['email' => $data['email']]);
+        // })
+        //     ->first();
+        
+        $user = User::where(function($q) use($data){
+            $q->where('mobile',$data['mobile'])
+            ->orwhere('email',$data['email']);
+        })->first();
+             
         $data->delete();
         if(!$user){
             return $this->ErrorResponse(200,'Something went wrong ..!');

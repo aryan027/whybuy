@@ -213,11 +213,13 @@ class AdController extends Controller
                 if($validator->fails()){
                     return $this->ErrorResponse(400,$validator->errors()->first());
                 }
-                $user = User::with(['getPublishedAdv' => function($query){
+                $userOwner = User::with(['getPublishedAdv' => function($query){
                     $query->where(['status' => true, 'approved' => true, 'published' => true]);
                 },'getPublishedAdv.media'])->where('id',$request->user_id)->first();
-                if(!empty($user)){
-                    return $this->SuccessResponse(200, 'Owner details get successfully',$user);
+                if(!empty($userOwner)){
+                    $userOwner->profile_picture = $userOwner->getFirstMediaUrl('profile_picture');
+                    unset($userOwner->media);
+                    return $this->SuccessResponse(200, 'Owner details get successfully',$userOwner);
                 }
                 return $this->ErrorResponse(404, 'Advertisement not found');
             }

@@ -50,7 +50,7 @@ class FavouriteController extends Controller
         try {
             $user = auth()->user();
             if(!empty($user)){
-                $favouriteAds= FavouriteAds::with('user','ads')->where('user_id',$user->id)->latest()->get();
+                $favouriteAds= FavouriteAds::with('user','ads.media')->where('user_id',$user->id)->latest()->get();
                 return $this->SuccessResponse(200,'Data fetch successfully ..',$favouriteAds);
             }
             return $this->ErrorResponse(200, 'Unauthenticated');
