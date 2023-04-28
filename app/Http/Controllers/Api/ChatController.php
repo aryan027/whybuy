@@ -85,11 +85,11 @@ class ChatController extends Controller
     }
 
     public function adChatList() {
-        $chats = ChatInteractions::with('ownerInfo', 'userInfo', 'chats')->where(['owner_id' => auth()->id(),'status' => true])->get();
+        $chats = ChatInteractions::with('ownerInfo', 'userInfo', 'chats','ads.media')->where(['owner_id' => auth()->id(),'status' => true])->get();
         return $this->SuccessResponse(200, 'fetched successfully', $chats);
     }
     public function ChatList($id) {
-        $chats = ChatInteractions::with('ownerInfo', 'userInfo', 'chats')->where(['id' => $id,'status' => true])->get();
+        $chats = ChatInteractions::with('ownerInfo', 'userInfo', 'chats','ads.media')->where(['id' => $id,'status' => true])->get();
         return $this->SuccessResponse(200, 'fetched successfully', $chats);
     }
 
@@ -112,14 +112,14 @@ class ChatController extends Controller
         }
         $myArray = explode(',', $chatIds);
         foreach ($myArray as $chat) {
-          $c= ChatInteractions::where(['user_id' => auth()->id(),'id'=> $chat])->get();
+          $c= ChatInteractions::with('ads')->where(['user_id' => auth()->id(),'id'=> $chat])->get();
             $c->update(['status' => false]);
         }
         return $this->SuccessResponse(200, 'All Chats deleted successfully');
     }
 
     public function listingOfUser() {
-        $chats = ChatInteractions::with('ownerInfo', 'userInfo', 'chats')->where(['user_id' => auth()->id(), 'status' => true])->get();
+        $chats = ChatInteractions::with('ownerInfo', 'userInfo', 'chats','ads.media')->where(['user_id' => auth()->id(), 'status' => true])->get();
         return $this->SuccessResponse(200, 'Listing Fetched', $chats);
     }
 }

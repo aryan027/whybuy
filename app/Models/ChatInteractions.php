@@ -25,4 +25,7 @@ class ChatInteractions extends Model
     public function chats() {
         return $this->hasMany(ChatMessages::class, 'chat_id', 'id');
     }
+    public function ads(){
+        return $this->belongsTo(Advertisement::class,'advertisement_id');
+    }
 }
